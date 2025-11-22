@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact — PT Experts Hub</title>
+  <meta name="description" content="Contact PT-EXPERT for post-tensioned slab design, assessment and project enquiries." />
+  <style>
+    /* ===== Reset & base ===== */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;-webkit-font-smoothing:antialiased}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;color:#0f172a;line-height:1.65;background:#fff}
+    img{max-width:100%;height:auto;display:block}
+    a{text-decoration:none;color:inherit}
+
+    /* ===== Theme tokens (consistent) ===== */
+    :root{
+      --navy:#071733;
+      --muted:#475569;
+      --yellow:#f7c624;
+      --container:1160px;
+      --border:#e6eef6;
+      --panel:#f4f6f8;
+    }
+    .container{max-width:var(--container);margin-inline:auto;padding:0 1.25rem}
+    .muted{color:var(--muted)}
+
+    /* ===== Header (shared) ===== */
+    header{position:sticky;top:0;z-index:50;background:rgba(10,26,50,.92);backdrop-filter:blur(8px)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;min-height:64px}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{width:190px;height:44px;background-image:url('assets/logo.jpg');background-size:contain;background-repeat:no-repeat;background-position:left center}
+    nav ul{list-style:none;display:flex;gap:1rem;margin:0;padding:0}
+    nav a{color:#dbe7ff;padding:.4rem .6rem;border-radius:8px;font-weight:700}
+    .join{background:var(--yellow);color:#111;padding:.6rem .9rem;border-radius:8px;font-weight:900}
+    .burger{display:none;background:none;border:0;color:#fff;font-size:1.5rem}
+
+    /* ===== Hero band (contact top) ===== */
+    .hero-band{padding:5rem 0;background:#fff}
+    .hero-grid{display:grid;grid-template-columns:1fr 520px;gap:2.5rem;align-items:center}
+    .hero-left h1{font-size:4rem;line-height:1;margin:0;color:var(--navy);font-weight:900}
+    .hero-right p{color:#374151;max-width:520px;margin:0;font-size:1.05rem}
+
+    /* ===== Contact details row ===== */
+    .contact-panel{padding:4rem 0;background:var(--panel)}
+    .contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;align-items:start}
+    .contact-card{background:transparent;padding:1rem}
+    .label{font-size:.85rem;letter-spacing:.18em;color:var(--muted);font-weight:700;margin-bottom:.6rem}
+    .value{font-weight:800;color:var(--navy);font-size:1.1rem}
+
+    /* ===== Map / visual ===== */
+    .map-wrap{margin-top:3rem;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+    .map-wrap img{width:100%;height:320px;object-fit:cover;display:block}
+
+    /* ===== CTA band (reuse) ===== */
+    .cta-band{background:var(--navy);color:#fff;padding:3.4rem 0;margin-top:2rem}
+    .cta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .cta-row h2{font-size:1.9rem;margin:0}
+
+    /* ===== Footer (shared) ===== */
+    footer{background:var(--navy);color:#d9e6ff;padding:2.4rem 0}
+    .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1.1fr;gap:1.5rem}
+
+    /* ===== Utilities & responsive ===== */
+    @media (max-width:1024px){
+      nav ul{position:fixed;top:64px;left:0;right:0;background:rgba(10,26,50,.98);backdrop-filter:blur(8px);flex-direction:column;padding:1rem 1.25rem;transform:translateY(-8px);opacity:0;pointer-events:none}
+      nav ul.open{transform:none;opacity:1;pointer-events:auto}
+      nav a{color:#fff}
+      .burger{display:block}
+      .hero-grid{grid-template-columns:1fr}
+      .contact-grid{grid-template-columns:1fr}
+      .map-wrap img{height:260px;object-fit:cover}
+    }
+    @media (max-width:560px){
+      .hero-left h1{font-size:2.4rem}
+      .hero-band{padding:3rem 0}
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <strong class="name" style="display:none">PTEXPERTSHUB</strong>
+      </a>
+      <nav aria-label="Main">
+        <ul id="navlinks">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="projects.html">Projects</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a class="join" href="masterclass.html">JOIN MASTERCLASS</a>
+        <button class="burger" id="burger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero / top band -->
+  <main>
+    <section class="hero-band">
+      <div class="container hero-grid">
+        <div class="hero-left">
+          <h1>Contact us</h1>
+        </div>
+        <div class="hero-right">
+          <p>Get in touch with PT-EXPERT for expert design solutions for post tension slab systems. Whether you have a project inquiry or need professional guidance, our team is here to assist you. Let’s build something exceptional together!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact details -->
+    <section class="contact-panel" id="contact">
+      <div class="container">
+        <div class="contact-grid">
+          <div class="contact-card">
+            <div class="label">EMAIL</div>
+            <div class="value"><a href="mailto:info@ptexpertshub.com">info@ptexpertshub.com</a></div>
+          </div>
+
+          <div class="contact-card">
+            <div class="label">LOCATIONS</div>
+            <div class="value">Dubai , UAE (Head office)<br/>Kerala , INDIA</div>
+          </div>
+
+          <div class="contact-card">
+            <div class="label">REACH US</div>
+            <div class="value"><a href="https://www.linkedin.com/in/ptexpertshub/" target="_blank" rel="noopener">www.linkedin.com/in/ptexpertshub/</a></div>
+          </div>
+        </div>
+
+        <!-- Map / image / visual -->
+        <div class="map-wrap">
+          <!-- using the uploaded image so it appears in your environment -->
+          <img src="/mnt/data/43e14ab5-640c-4e2c-bb2a-79e52c3bdce8.png" alt="Map / office location snapshot" />
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-band">
+      <div class="container cta-row">
+        <h2>Have a project in mind? Let’s get to work.</h2>
+        <a class="join" href="contact.html" style="background:var(--yellow);color:#071733;padding:.8rem 1rem;border-radius:8px;font-weight:900">CONTACT US</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <div class="foot-logo"><span class="logo"></span><strong>PTEXPERTSHUB</strong></div>
+        <p class="muted" style="color:#c2d6ff">At PT-EXPERT, we specialize in post-tensioned slab systems, offering tailored design, assessment, and strengthening solutions. Driven by sustainability and efficiency, we deliver innovative, durable results for every project.</p>
+        <p style="color:#9fb5db;margin-top:.6rem">© <span id="year"></span> PT Experts</p>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">QUICK LINKS</h4>
+        <ul style="list-style:none;padding:0;margin:.6rem 0 0;line-height:2.1">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">KEEP IN TOUCH</h4>
+        <p style="margin:.4rem 0">Email<br/><a href="mailto:info@ptexpertshub.com" style="color:#ffd75a">info@ptexpertshub.com</a></p>
+        <p style="margin:.4rem 0">Location<br/>Dubai, UAE<br/>Kerala, INDIA</p>
+        <p style="margin:.4rem 0">Reach us<br/>Call us +971 52 855 3400</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floaters -->
+  <div style="position:fixed;right:18px;bottom:18px;z-index:60"><a href="#top" style="display:inline-block;background:var(--yellow);padding:.7rem .9rem;border-radius:999px;font-weight:900;color:#071733">↑</a></div>
+
+  <script>
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const links  = document.getElementById('navlinks');
+    function closeMenu(){ links.classList.remove('open'); document.body.classList.remove('mobile-open'); }
+    function openMenu(){  links.classList.add('open');    document.body.classList.add('mobile-open'); }
+    burger?.addEventListener('click', ()=>{ const isOpen = links.classList.contains('open'); isOpen ? closeMenu() : openMenu(); });
+    links?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    window.addEventListener('keydown', e => { if(e.key === 'Escape') closeMenu(); });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

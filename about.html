@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About — PT Experts Hub</title>
+  <meta name="description" content="About PT-EXPERT: tailored structural design services for post-tensioned slab systems." />
+  <style>
+    /* ===== Reset & base ===== */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;-webkit-font-smoothing:antialiased}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;color:#0f172a;line-height:1.65;background:#fff}
+    img{max-width:100%;height:auto;display:block}
+    a{text-decoration:none;color:inherit}
+
+    /* ===== Theme tokens ===== */
+    :root{
+      --navy:#071733;
+      --navy-2:#0e2747;
+      --muted:#475569;
+      --ink:#0f172a;
+      --bg:#ffffff;
+      --panel:#f4f7fb;
+      --border:#e2e8f0;
+      --yellow:#f7c624;
+      --radius:18px;
+      --container:1160px;
+    }
+    .container{max-width:var(--container);margin-inline:auto;padding:0 1.25rem}
+    .muted{color:var(--muted)}
+
+    /* ===== Header ===== */
+    header{position:sticky;top:0;z-index:50;background:rgba(10,26,50,.92);backdrop-filter:blur(8px);}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;min-height:64px}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{width:190px;height:44px;border-radius:2px;background-image:url('assets/logo.jpg');background-size:contain;background-repeat:no-repeat;background-position:left center}
+    nav ul{list-style:none;display:flex;gap:1rem;margin:0;padding:0}
+    nav a{color:#dbe7ff;padding:.4rem .6rem;border-radius:8px;font-weight:700}
+    .join{background:var(--yellow);color:#111;padding:.6rem .9rem;border-radius:8px;font-weight:900}
+    .burger{display:none;background:none;border:0;color:#fff;font-size:1.5rem}
+
+    /* ===== About hero / intro ===== */
+    .about-hero{padding:3.5rem 0 0;background:#fff}
+    /* keep original grid but allow right column to stretch taller */
+    .about-grid{display:grid;grid-template-columns:1fr 520px;gap:2.5rem;align-items:start;padding:3.2rem 0}
+    .kicker{letter-spacing:.12em;font-size:.8rem;color:#64748b;font-weight:800}
+    h1{font-size:clamp(1.8rem,3.4vw,2.6rem);margin:.2rem 0 .6rem}
+    .lead{font-weight:800;font-size:1.4rem;color:#071733}
+    .intro p{color:#334155;margin-top:.6rem}
+
+    /* ===== Minimal image-only tweaks (non-destructive) =====
+       These only affect the right image so it appears tall & crops like your screenshot.
+    */
+    .about-grid{align-items:stretch} /* allow right column to fill vertical space */
+    .about-grid .frame{
+      height:100vh;            /* make image column fill viewport height */
+      overflow:hidden;         /* crop overflow */
+      border-radius:0;         /* flush like reference screenshot */
+      box-shadow:none;
+    }
+    .about-grid .frame img{
+      width:100%;
+      height:100%;
+      object-fit:cover;        /* crop to fill */
+      display:block;
+    }
+
+    /* ===== Work process ===== */
+    .work{background:#f7f9fc;padding:3.2rem 0;border-top:1px solid var(--border)}
+    .work-grid{display:grid;grid-template-columns:1fr 420px;gap:2rem;align-items:start}
+    .work h2{font-size:1.8rem;margin:0 0 .6rem}
+    .process-list{display:flex;flex-direction:column;gap:.9rem}
+    .process-item{display:flex;gap:.9rem;align-items:flex-start}
+    .dot{width:48px;height:48px;border-radius:12px;background:var(--yellow);display:grid;place-items:center;font-weight:900;color:#071733}
+    .muted-small{color:var(--muted);font-size:.95rem}
+
+    /* ===== CTA dark band ===== */
+    .cta-band{background:var(--navy);color:#fff;padding:3.4rem 0;margin-top:2rem}
+    .cta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .cta-row h2{font-size:1.9rem;margin:0}
+
+    /* ===== Footer ===== */
+    footer{background:var(--navy);color:#d9e6ff;padding:2.4rem 0}
+    .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1.1fr;gap:1.5rem}
+    .foot-logo{display:flex;align-items:center;gap:.75rem}
+
+    /* ===== Utilities & responsive ===== */
+    .frame{border-radius:12px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.12)}
+    .section-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+
+    @media (max-width: 1024px){
+      nav ul{position:fixed;top:64px;left:0;right:0;background:rgba(10,26,50,.98);backdrop-filter:blur(8px);flex-direction:column;padding:1rem 1.25rem;transform:translateY(-8px);opacity:0;pointer-events:none}
+      nav ul.open{transform:none;opacity:1;pointer-events:auto}
+      nav a{color:#fff}
+      .burger{display:block}
+      .about-grid{grid-template-columns:1fr;} /* stack on smaller screens */
+      .about-grid .frame{height:auto}        /* stop forcing full viewport height on mobile */
+      .about-grid .frame img{object-fit:cover;height:auto}
+      .work-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:560px){
+      .about-grid{gap:1rem;padding:2rem 0}
+      .work{padding:2rem 0}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <strong class="name" style="display:none">PTEXPERTSHUB</strong>
+      </a>
+      <nav aria-label="Main">
+        <ul id="navlinks">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html" aria-current="page">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="projects.html">Projects</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a class="join" href="contact.html">JOIN MASTERCLASS</a>
+        <button class="burger" id="burger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="about-hero">
+    <div class="container intro-grid">
+      <div class="intro">
+        <div class="kicker">ABOUT US</div>
+        <h1>Tailored structural design services</h1>
+        <p class="muted-small"> PT-EXPERT specializes in offering comprehensive and innovative solutions for post-tensioned (PT) slab systems, making us a trusted partner for construction projects that require superior structural integrity. Our core focus is on combining engineering excellence with sustainability, ensuring that each project not only meets but exceeds client expectations while promoting long-term environmental and economic benefits.</p>
+
+        <h3>Commitment to Excellence</h3>
+        <p class="muted-small">At PT-EXPERT, we recognize that the strength of any structure lies not only in its design but also in its ability to withstand the test of time. Based in Dubai, we leverage cutting-edge technologies and the latest industry practices to ensure that each PT slab system we design is robust, sustainable, and built to last. Our expert team is committed to delivering the highest quality of service at every stage of the project, from design to execution, and ensuring that all systems are optimized for efficiency, durability, and cost-effectiveness.</p>
+      </div>
+
+      <aside class="frame" aria-hidden="true">
+        <img src="assets/about1.png" alt="Construction towers and cranes" />
+      </aside>
+    </div>
+
+    <!-- Work process section (matching screenshot) -->
+    <section class="work">
+      <div class="container">
+        <div class="section-head">
+          <h2>Our work process</h2>
+          <div style="color:var(--muted);font-weight:700">Tailored, proven, sustainable</div>
+        </div>
+
+        <div class="work-grid">
+          <div>
+            <div class="process-list" style="margin-top:1.2rem">
+              <div class="process-item"><div><strong>Tailored Solutions:</strong><div class="muted-small">Each project is unique, and we customize our designs and solutions to meet the specific needs of our clients, ensuring the most effective and efficient outcome.</div></div></div>
+              <div class="process-item"><div><strong>Innovative Designs:</strong><div class="muted-small">We are constantly evolving and applying the latest advancements in post-tensioning technology, offering our clients cutting-edge solutions.</div></div></div>
+              <div class="process-item"><div><strong>Sustainability Focus:</strong><div class="muted-small">Our dedication to sustainability ensures that every design contributes to a greener and more sustainable built environment.</div></div></div>
+              <div class="process-item"><div><strong>Expert Team:</strong><div class="muted-small">Our team of highly skilled engineers and professionals bring decades of combined experience, ensuring that every project benefits from the highest level of expertise.</div></div></div>
+            </div>
+
+            <p style="margin-top:1rem;color:var(--muted)">PT-EXPERT is committed to excellence, and we take pride in delivering post-tensioned slab solutions that stand the test of time, enhancing durability, safety, and sustainability.</p>
+          </div>
+
+          <div>
+            <img src="assets/about2.png" alt="Engineers collaborating" style="border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.12)" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-band">
+      <div class="container cta-row">
+        <h2>Have a project in mind? Let’s get to work.</h2>
+        <a class="join" href="contact.html" style="background:var(--yellow);color:#071733;padding:.8rem 1rem;border-radius:8px;font-weight:900">CONTACT US</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div class="container footer-grid">
+      <div>
+        <div class="foot-logo"><span class="logo"></span><strong>PTEXPERTSHUB</strong></div>
+        <p class="muted" style="color:#c2d6ff">At PT-EXPERT, we specialize in post-tensioned slab systems, offering tailored design, assessment, and strengthening solutions. Driven by sustainability and efficiency, we deliver innovative, durable results for every project. Based in Dubai, we ensure your structures stand the test of time.</p>
+        <p style="color:#9fb5db;margin-top:.6rem">© <span id="year"></span> PT Experts</p>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">QUICK LINKS</h4>
+        <ul style="list-style:none;padding:0;margin:.6rem 0 0;line-height:2.1">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">KEEP IN TOUCH</h4>
+        <p style="margin:.4rem 0">Email<br/><a href="mailto:info@ptexpertshub.com" style="color:#ffd75a">info@ptexpertshub.com</a></p>
+        <p style="margin:.4rem 0">Location<br/>Dubai, UAE<br/>Kerala, INDIA</p>
+        <p style="margin:.4rem 0">Reach us<br/>Call us +971 52 855 3400</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floaters -->
+  <div style="position:fixed;right:18px;bottom:18px;z-index:60"><a href="#top" style="display:inline-block;background:var(--yellow);padding:.7rem .9rem;border-radius:999px;font-weight:900;color:#071733">↑</a></div>
+
+  <script>
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const links  = document.getElementById('navlinks');
+    function closeMenu(){ links.classList.remove('open'); document.body.classList.remove('mobile-open'); }
+    function openMenu(){  links.classList.add('open');    document.body.classList.add('mobile-open'); }
+    burger?.addEventListener('click', ()=>{ const isOpen = links.classList.contains('open'); isOpen ? closeMenu() : openMenu(); });
+    links?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    window.addEventListener('keydown', e => { if(e.key === 'Escape') closeMenu(); });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Services — PT Experts Hub</title>
+  <meta name="description" content="PT-EXPERT services: Preliminary PT slab design, detailed drawings, assessment, value engineering, training, and shop drawings." />
+  <style>
+    /* ===== Reset & base ===== */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;-webkit-font-smoothing:antialiased}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;color:#0f172a;line-height:1.65;background:#fff}
+    img{max-width:100%;height:auto;display:block}
+    a{text-decoration:none;color:inherit}
+
+    /* ===== Theme tokens (same as other pages) ===== */
+    :root{
+      --navy:#071733;
+      --muted:#475569;
+      --yellow:#f7c624;
+      --container:1160px;
+      --border:#e2e8f0;
+    }
+    .container{max-width:var(--container);margin-inline:auto;padding:0 1.25rem}
+    .muted{color:var(--muted)}
+
+    /* ===== Header (shared) ===== */
+    header{position:sticky;top:0;z-index:50;background:rgba(10,26,50,.92);backdrop-filter:blur(8px)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;min-height:64px}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{width:190px;height:44px;background-image:url('assets/logo.jpg');background-size:contain;background-repeat:no-repeat;background-position:left center}
+    nav ul{list-style:none;display:flex;gap:1rem;margin:0;padding:0}
+    nav a{color:#dbe7ff;padding:.4rem .6rem;border-radius:8px;font-weight:700}
+    .join{background:var(--yellow);color:#111;padding:.6rem .9rem;border-radius:8px;font-weight:900}
+    .burger{display:none;background:none;border:0;color:#fff;font-size:1.5rem}
+
+    /* ===== Services hero (two-column) ===== */
+    .services-hero{padding:4.5rem 0}
+    .hero-grid{display:grid;grid-template-columns:1fr 520px;gap:2.5rem;align-items:center}
+    .hero-left{padding:2rem 0}
+    .hero-left h1{font-size:4rem;line-height:1; margin:0 0 1.2rem; font-weight:900; color:var(--navy)}
+    .hero-left p{max-width:560px;color:#334155;font-size:1.05rem}
+    .hero-right{padding-left:1rem}
+    .hero-right img{width:100%;height:420px;object-fit:cover;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.08)}
+
+    /* ===== Services section ===== */
+    .services-list{padding:3.5rem 0}
+    .service-row{display:grid;grid-template-columns:1fr 480px;gap:2rem;align-items:center;margin-bottom:3.5rem}
+    .service-content h3{font-size:1.6rem;margin:0 0 .6rem;color:var(--navy)}
+    .service-content p{color:#334155}
+    .service-thumb img{width:100%;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.08)}
+
+    /* small decorative spacing to match screenshot */
+    .spacer{height:2.5rem}
+
+    /* ===== Footer ===== */
+    footer{background:var(--navy);color:#d9e6ff;padding:2.4rem 0}
+    .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1.1fr;gap:1.5rem}
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1024px){
+      nav ul{position:fixed;top:64px;left:0;right:0;background:rgba(10,26,50,.98);backdrop-filter:blur(8px);flex-direction:column;padding:1rem 1.25rem;transform:translateY(-8px);opacity:0;pointer-events:none}
+      nav ul.open{transform:none;opacity:1;pointer-events:auto}
+      nav a{color:#fff}
+      .burger{display:block}
+      .hero-grid{grid-template-columns:1fr}
+      .hero-right img{height:320px}
+      .service-row{grid-template-columns:1fr}
+    }
+    @media (max-width:560px){
+      .hero-left h1{font-size:2.4rem}
+    }
+  </style>
+</head>
+<body>
+  <!-- Header (same look) -->
+  <header>
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <strong class="name" style="display:none">PTEXPERTSHUB</strong>
+      </a>
+      <nav aria-label="Main">
+        <ul id="navlinks">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html" aria-current="page">Services</a></li>
+          <li><a href="projects.html">Projects</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a class="join" href="masterclass.html">JOIN MASTERCLASS</a>
+        <button class="burger" id="burger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero: big left heading, paragraph on right (screenshot) -->
+  <main>
+    <section class="services-hero">
+      <div class="container hero-grid">
+        <div class="hero-left">
+          <h1>Our Services</h1>
+        </div>
+
+        <div class="hero-right">
+          <!-- using the uploaded file path as requested -->
+          
+          <p style="margin-top:.9rem;color:var(--muted)">At PT-EXPERT, we offer tailored solutions for post-tensioned slab systems, including design, assessment, strengthening, and sustainability evaluation. Our expertise ensures efficient, durable, and innovative results for every project.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="spacer"></div>
+
+    <!-- Example services list: left content, right image -->
+    <section class="services-list">
+      <div class="container">
+        <!-- Service 1 -->
+        <div class="service-row">
+          <div class="service-content">
+            <h3>Preliminary PT Slab Design</h3>
+            <p>Start your construction project on the right foot with our preliminary post-tensioned slab design services. Our team of experts conducts thorough analyses to create innovative and sustainable slab designs tailored to your specific requirements. By utilizing advanced engineering techniques, we ensure that your project not only meets safety standards but also maximizes cost-efficiency and constructability.</p>
+          </div>
+          <div class="service-thumb">
+            <img src="assets/S1.png" alt="Preliminary design" />
+          </div>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="service-row">
+          <div class="service-content">
+            <h3>Detailed Design and Drawings</h3>
+            <p>Transform concepts into construction-ready documentation with our detailed design and drawing services. We deliver precise reinforcement layouts, PT profiles, tendon layouts, and shop drawings that integrate smoothly with your construction workflow.</p>
+          </div>
+          <div class="service-thumb">
+            <img src="assets/S2.png" alt="Detailed drawings" />
+          </div>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="service-row">
+          <div class="service-content">
+            <h3>Assessment of Existing Slabs</h3>
+            <p>Ensure the safety and longevity of existing structures by leveraging our assessment and strengthening expertise. We provide structural evaluation, non-destructive testing recommendations, retrofit design, and strengthening schemes that are practical and cost-effective.</p>
+          </div>
+          <div class="service-thumb">
+            <img src="assets/S3.png" alt="Slab assessment" />
+          </div>
+        </div>
+
+        <!-- Service 4 -->
+        <div class="service-row">
+          <div class="service-content">
+            <h3>Value Engineering for PT Slabs</h3>
+            <p>Optimize costs without compromising structural integrity. Our value engineering approach helps you select efficient designs, materials, and construction sequences that reduce lifecycle costs and speed up delivery.</p>
+          </div>
+          <div class="service-thumb">
+            <img src="assets/S4.png" alt="Value engineering" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer (matching other pages) -->
+  <footer id="contact">
+    <div class="container footer-grid">
+      <div>
+        <div class="foot-logo"><span class="logo"></span><strong>PTEXPERTSHUB</strong></div>
+        <p class="muted" style="color:#c2d6ff">At PT-EXPERT, we specialize in post-tensioned slab systems, offering tailored design, assessment, and strengthening solutions. Driven by sustainability and efficiency, we deliver durable results for every project.</p>
+        <p style="color:#9fb5db;margin-top:.6rem">© <span id="year"></span> PT Experts</p>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">QUICK LINKS</h4>
+        <ul style="list-style:none;padding:0;margin:.6rem 0 0;line-height:2.1">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">KEEP IN TOUCH</h4>
+        <p style="margin:.4rem 0">Email<br/><a href="mailto:info@ptexpertshub.com" style="color:#ffd75a">info@ptexpertshub.com</a></p>
+        <p style="margin:.4rem 0">Location<br/>Dubai, UAE<br/>Kerala, INDIA</p>
+        <p style="margin:.4rem 0">Reach us<br/>Call us +971 52 855 3400</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floaters -->
+  <div style="position:fixed;right:18px;bottom:18px;z-index:60"><a href="#top" style="display:inline-block;background:var(--yellow);padding:.7rem .9rem;border-radius:999px;font-weight:900;color:#071733">↑</a></div>
+
+  <script>
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const links  = document.getElementById('navlinks');
+    function closeMenu(){ links.classList.remove('open'); document.body.classList.remove('mobile-open'); }
+    function openMenu(){  links.classList.add('open');    document.body.classList.add('mobile-open'); }
+    burger?.addEventListener('click', ()=>{ const isOpen = links.classList.contains('open'); isOpen ? closeMenu() : openMenu(); });
+    links?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    window.addEventListener('keydown', e => { if(e.key === 'Escape') closeMenu(); });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

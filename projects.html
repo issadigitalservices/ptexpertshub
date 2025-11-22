@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects — PT Experts Hub</title>
+  <meta name="description" content="PT-EXPERT projects: examples of detailed PT slab designs, assessments and strengthening projects." />
+  <style>
+    /* ===== Reset & base ===== */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;-webkit-font-smoothing:antialiased}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;color:#0f172a;line-height:1.65;background:#fff}
+    img{max-width:100%;height:auto;display:block}
+    a{text-decoration:none;color:inherit}
+
+    /* ===== Theme tokens (consistent with other pages) ===== */
+    :root{
+      --navy:#071733;
+      --muted:#475569;
+      --yellow:#f7c624;
+      --container:1160px;
+      --panel:#f4f7fb;
+      --border:#e6eef6;
+    }
+    .container{max-width:var(--container);margin-inline:auto;padding:0 1.25rem}
+    .muted{color:var(--muted)}
+
+    /* ===== Header (shared) ===== */
+    header{position:sticky;top:0;z-index:50;background:rgba(10,26,50,.92);backdrop-filter:blur(8px)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;min-height:64px}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{width:190px;height:44px;background-image:url('assets/logo.jpg');background-size:contain;background-repeat:no-repeat;background-position:left center}
+    nav ul{list-style:none;display:flex;gap:1rem;margin:0;padding:0}
+    nav a{color:#dbe7ff;padding:.4rem .6rem;border-radius:8px;font-weight:700}
+    .join{background:var(--yellow);color:#111;padding:.6rem .9rem;border-radius:8px;font-weight:900}
+    .burger{display:none;background:none;border:0;color:#fff;font-size:1.5rem}
+
+    /* ===== Hero band (light background) ===== */
+    .hero-band{background:#f4f6f8;padding:4.5rem 0}
+    .hero-grid{display:grid;grid-template-columns:1fr 520px;gap:2.5rem;align-items:center}
+    .hero-left h1{font-size:4rem;line-height:1;margin:0;color:var(--navy);font-weight:900}
+    .hero-right p{color:#374151;max-width:520px;margin:0}
+
+    /* ===== Projects grid ===== */
+    .projects-wrap{padding:3.5rem 0}
+    .projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}
+    .project-card{
+      background:#fff;border-radius:18px;padding:1.1rem;border:1px solid var(--border);
+      box-shadow:0 8px 20px rgba(8,20,40,0.04);overflow:hidden;display:flex;flex-direction:column;height:100%;
+    }
+    .project-thumb{border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#f1f5f9;display:block}
+    .project-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .project-title{font-weight:800;margin:1rem 0 .4rem;color:var(--navy)}
+    .project-excerpt{color:var(--muted);flex:1}
+
+    /* large spacing before grid (to match screenshot) */
+    .hero-spacer{height:2.5rem}
+
+    /* ===== CTA band (reuse style) ===== */
+    .cta-band{background:var(--navy);color:#fff;padding:3.4rem 0;margin-top:2rem}
+    .cta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .cta-row h2{font-size:1.9rem;margin:0}
+
+    /* ===== Footer (shared) ===== */
+    footer{background:var(--navy);color:#d9e6ff;padding:2.4rem 0}
+    .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1.1fr;gap:1.5rem}
+
+    /* ===== Responsive ===== */
+    @media (max-width:1024px){
+      nav ul{position:fixed;top:64px;left:0;right:0;background:rgba(10,26,50,.98);backdrop-filter:blur(8px);flex-direction:column;padding:1rem 1.25rem;transform:translateY(-8px);opacity:0;pointer-events:none}
+      nav ul.open{transform:none;opacity:1;pointer-events:auto}
+      nav a{color:#fff}
+      .burger{display:block}
+      .hero-grid{grid-template-columns:1fr}
+      .projects-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:560px){
+      .hero-left h1{font-size:2.4rem}
+      .hero-band{padding:2.8rem 0}
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <strong class="name" style="display:none">PTEXPERTSHUB</strong>
+      </a>
+      <nav aria-label="Main">
+        <ul id="navlinks">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="projects.html" aria-current="page">Projects</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a class="join" href="masterclass.html">JOIN MASTERCLASS</a>
+        <button class="burger" id="burger" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero band -->
+  <main>
+    <section class="hero-band">
+      <div class="container hero-grid">
+        <div class="hero-left">
+          <h1>Our Projects</h1>
+        </div>
+
+        <div class="hero-right">
+          <!-- short descriptive paragraph on the right like screenshot -->
+          <p>Discover how PT-EXPERT delivers innovative and sustainable post-tensioned slab solutions. Each project reflects our commitment to quality, efficiency, and lasting structural excellence.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="hero-spacer"></div>
+
+    <!-- Projects grid -->
+    <section class="projects-wrap">
+      <div class="container">
+        <div class="projects-grid">
+          <!-- Project card 1 -->
+          <article class="project-card">
+            <figure class="project-thumb" aria-hidden="true">
+              <!-- using the uploaded project image path -->
+              <img src="assets/P1.png" alt="Project 1 - PT slab model" />
+            </figure>
+            <h3 class="project-title">DETAILED DESIGN OF PROPOSED STUDENTS SCHOOL</h3>
+            <p class="project-excerpt">Comprehensive PT slab design and reinforcement detailing for a multi-level student facility — includes tendon profiles, lift slab coordination, and constructability checks.</p>
+          </article>
+
+          <!-- Project card 2 -->
+          <article class="project-card">
+            <figure class="project-thumb" aria-hidden="true">
+              <img src="assets/P2.png" alt="Project 2 - PT slab model" />
+            </figure>
+            <h3 class="project-title">DETAILED DESIGN OF PROPOSED BUILDING AT BOMBAY</h3>
+            <p class="project-excerpt">Full PT design package with shop drawings, tendon schedules, tendon stressing sequence and value engineering recommendations for cost and time savings.</p>
+          </article>
+
+          <!-- Project card 3 -->
+          <article class="project-card">
+            <figure class="project-thumb" aria-hidden="true">
+              <img src="assets/p3.png" alt="Project 3 - PT slab model" />
+            </figure>
+            <h3 class="project-title">INTERNAL MODIFICATION OF KIDS PLAY AREA</h3>
+            <p class="project-excerpt">Assessment and strengthening of existing slabs for internal remodelling — non-destructive testing, retrofit design and detailed execution drawings.</p>
+          </article>
+
+          <!-- Project card 4 -->
+          <article class="project-card">
+            <figure class="project-thumb" aria-hidden="true">
+              <img src="assets/P4.png" alt="Project 4 - PT slab model" />
+            </figure>
+            <h3 class="project-title">PROPOSED HILTON HOTEL SAUDI ARABIA</h3>
+            <p class="project-excerpt">High-rise PT slab analysis and shop drawing coordination for a hospitality project, including durability and lifecycle-focused solutions.</p>
+          </article>
+
+          <!-- Project card 5 -->
+          <article class="project-card">
+            <figure class="project-thumb" aria-hidden="true">
+              <img src="assets/P5.png" alt="Project 4 - PT slab model" />
+            </figure>
+            <h3 class="project-title">PROPOSED HILTON HOTEL SAUDI ARABIA</h3>
+            <p class="project-excerpt">High-rise PT slab analysis and shop drawing coordination for a hospitality project, including durability and lifecycle-focused solutions.</p>
+          </article>
+
+          <!-- Project card 6 -->
+          <article class="project-card">
+            <figure class="project-thumb" aria-hidden="true">
+              <img src="assets/P6.png" alt="Project 4 - PT slab model" />
+            </figure>
+            <h3 class="project-title">PROPOSED HILTON HOTEL SAUDI ARABIA</h3>
+            <p class="project-excerpt">High-rise PT slab analysis and shop drawing coordination for a hospitality project, including durability and lifecycle-focused solutions.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-band">
+      <div class="container cta-row">
+        <h2>Have a project in mind? Let’s get to work.</h2>
+        <a class="join" href="contact.html" style="background:var(--yellow);color:#071733;padding:.8rem 1rem;border-radius:8px;font-weight:900">CONTACT US</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div class="container footer-grid">
+      <div>
+        <div class="foot-logo"><span class="logo"></span><strong>PTEXPERTSHUB</strong></div>
+        <p class="muted" style="color:#c2d6ff">At PT-EXPERT, we specialize in post-tensioned slab systems, offering tailored design, assessment, and strengthening solutions. Driven by sustainability and efficiency, we deliver durable results for every project.</p>
+        <p style="color:#9fb5db;margin-top:.6rem">© <span id="year"></span> PT Experts</p>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">QUICK LINKS</h4>
+        <ul style="list-style:none;padding:0;margin:.6rem 0 0;line-height:2.1">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:#dbe7ff">KEEP IN TOUCH</h4>
+        <p style="margin:.4rem 0">Email<br/><a href="mailto:info@ptexpertshub.com" style="color:#ffd75a">info@ptexpertshub.com</a></p>
+        <p style="margin:.4rem 0">Location<br/>Dubai, UAE<br/>Kerala, INDIA</p>
+        <p style="margin:.4rem 0">Reach us<br/>Call us +971 52 855 3400</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floaters -->
+  <div style="position:fixed;right:18px;bottom:18px;z-index:60"><a href="#top" style="display:inline-block;background:var(--yellow);padding:.7rem .9rem;border-radius:999px;font-weight:900;color:#071733">↑</a></div>
+
+  <script>
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const links  = document.getElementById('navlinks');
+    function closeMenu(){ links.classList.remove('open'); document.body.classList.remove('mobile-open'); }
+    function openMenu(){  links.classList.add('open');    document.body.classList.add('mobile-open'); }
+    burger?.addEventListener('click', ()=>{ const isOpen = links.classList.contains('open'); isOpen ? closeMenu() : openMenu(); });
+    links?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    window.addEventListener('keydown', e => { if(e.key === 'Escape') closeMenu(); });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
