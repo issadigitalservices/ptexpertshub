@@ -9,7 +9,13 @@
     /* ===== Reset ===== */
     *,*::before,*::after{box-sizing:border-box}
     html,body{margin:0;overflow-x:hidden}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;color:#0f172a;line-height:1.65;background:#fff}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;
+      color:#0f172a;
+      line-height:1.65;
+      background:#fff;
+      padding-top:80px; /* space for fixed header */
+    }
     img{max-width:100%;height:auto;display:block}
     a{text-decoration:none;color:inherit}
     h1,h2,h3{letter-spacing:.2px}
@@ -37,14 +43,22 @@
     .btn.dark-outline{border:2px solid var(--navy);color:var(--navy);background:transparent}
 
     /* ===== Header ===== */
-    header{position:sticky;top:0;z-index:50;background:rgba(10,26,50,.9);backdrop-filter:saturate(180%) blur(12px)}
+    header{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:999;
+      background:rgba(10,26,50,.95);
+      backdrop-filter:saturate(180%) blur(12px);
+    }
     .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;min-height:64px}
     .brand{display:flex;align-items:center;gap:.75rem}
 
-    /* Use your transparent PNG if available (recommended) */
+    /* Logo */
     .logo{
       width:200px;height:52px;border-radius:2px;
-      background-image:url('assets/logo.jpg'); /* fallback: use logo.jpg if needed */
+      background-image:url('assets/logo.jpg');
       background-size:contain;background-repeat:no-repeat;background-position:center;border:0;
     }
     .logo::after{content:none}
@@ -61,14 +75,20 @@
     .hero{position:relative;color:#fff}
     .hero-bg{
       position:absolute;inset:0;
-      background-image:
-        linear-gradient(180deg, rgba(3,7,18,.25), rgba(3,7,18,.55)),
+      background:
+        linear-gradient(rgba(8,20,60,.75), rgba(8,20,60,.75)),
         url('assets/hero.jpg');
-      background-size:cover;background-position:center;background-repeat:no-repeat;
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
     }
-    /* If hero looks too dark, you can remove this ::after overlay */
-    .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,7,18,.15),rgba(3,7,18,.35));}
-    .hero-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6.2rem 0 7.2rem}
+    .hero-inner{
+      position:relative;z-index:1;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      text-align:center;
+      padding:6.2rem 0 7.2rem;
+    }
     .hero h1{font-size:clamp(2rem,6vw,4.2rem);line-height:1.05;margin:0 0 1rem;font-weight:1000}
     .hero p{max-width:860px;color:#d8e6ff;font-size:1.15rem;margin:.2rem auto 1.6rem}
     .hero .cta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
