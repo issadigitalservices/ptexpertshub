@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PT Services – Sustainable Structural Solutions</title>
-  <meta name="description" content="Single-file HTML landing page: hero, overlapping features, two-column intro, stats band, services grid, projects, CTA, why-choose-us, footer." />
+  <meta name="description" content="Landing page with scroll reveal, staggered cards and animated counters." />
   <style>
     /* ===== Reset ===== */
     *,*::before,*::after{box-sizing:border-box}
@@ -14,7 +14,7 @@
       color:#0f172a;
       line-height:1.65;
       background:#fff;
-      padding-top:80px; /* space for fixed header */
+      padding-top:80px; /* room for fixed header */
     }
     img{max-width:100%;height:auto;display:block}
     a{text-decoration:none;color:inherit}
@@ -23,16 +23,13 @@
     /* ===== Theme ===== */
     :root{
       --navy:#0a1a32;
-      --navy-2:#0e2747;
-      --muted:#475569;
-      --ink:#0f172a;
-      --bg:#ffffff;
+      --muted:#64748b;
+      --yellow:#f7c624;
+      --container:1240px;
       --panel:#f4f7fb;
       --border:#e2e8f0;
-      --yellow:#f7c624;
       --radius:18px;
       --shadow:0 14px 36px rgba(12,24,44,.16);
-      --container:1240px;
     }
     .container{max-width:var(--container);margin-inline:auto;padding:0 1.25rem}
     .muted{color:var(--muted)}
@@ -40,30 +37,16 @@
     .btn{display:inline-block;padding:.95rem 1.2rem;border-radius:10px;font-weight:800;letter-spacing:.3px}
     .btn.primary{background:var(--yellow);color:#111}
     .btn.outline{border:2px solid rgba(255,255,255,.8);color:#fff;background:transparent}
-    .btn.dark-outline{border:2px solid var(--navy);color:var(--navy);background:transparent}
 
     /* ===== Header ===== */
     header{
-      position:fixed;
-      top:0;
-      left:0;
-      right:0;
-      z-index:999;
-      background:rgba(10,26,50,.95);
-      backdrop-filter:saturate(180%) blur(12px);
+      position:fixed;top:0;left:0;right:0;z-index:999;
+      background:rgba(10,26,50,.95);backdrop-filter:saturate(180%) blur(12px);
     }
     .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;min-height:64px}
     .brand{display:flex;align-items:center;gap:.75rem}
-
-    /* Logo */
-    .logo{
-      width:200px;height:52px;border-radius:2px;
-      background-image:url('assets/logo.png');
-      background-size:contain;background-repeat:no-repeat;background-position:center;border:0;
-    }
-    .logo::after{content:none}
+    .logo{width:200px;height:52px;border-radius:2px;background-image:url('assets/22oldlogo.png');background-size:contain;background-repeat:no-repeat;background-position:left center;border:0}
     .brand .name{display:none}
-
     nav ul{list-style:none;display:flex;gap:1.2rem;margin:0;padding:0}
     nav a{color:#dbe7ff;padding:.4rem .6rem;border-radius:8px;font-weight:700}
     nav a:hover{background:rgba(255,255,255,.08)}
@@ -72,23 +55,15 @@
     .burger{display:none;background:none;border:0;color:#fff;font-size:1.5rem}
 
     /* ===== Hero ===== */
-    .hero{position:relative;color:#fff}
+    .hero{position:relative;color:#fff;overflow:hidden}
     .hero-bg{
-      position:absolute;inset:0;
-      background:
+      position:absolute;inset:0;background:
         linear-gradient(rgba(8,20,60,.75), rgba(8,20,60,.75)),
         url('assets/hero.jpg');
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
+      background-size:cover;background-position:center;background-repeat:no-repeat;
+      transform-origin:center center;
     }
-    .hero-inner{
-      position:relative;z-index:1;
-      display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
-      text-align:center;
-      padding:6.2rem 0 7.2rem;
-    }
+    .hero-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6.2rem 0 7.2rem}
     .hero h1{font-size:clamp(2rem,6vw,4.2rem);line-height:1.05;margin:0 0 1rem;font-weight:1000}
     .hero p{max-width:860px;color:#d8e6ff;font-size:1.15rem;margin:.2rem auto 1.6rem}
     .hero .cta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
@@ -102,25 +77,20 @@
     .icon{width:48px;height:48px;border-radius:999px;background:var(--yellow);display:grid;place-items:center;font-weight:900;color:#0b1f38;box-shadow:0 6px 16px rgba(247,198,36,.35)}
 
     /* ===== Two-column intro block ===== */
-    .intro{background:#f3f6fb}
+    .intro{background:var(--panel)}
     .intro-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center;padding:3.5rem 0}
-    .kicker{letter-spacing:.15em;font-size:.8rem;color:#64748b;font-weight:800}
+    .kicker{letter-spacing:.15em;font-size:.8rem;color:var(--muted);font-weight:800}
     .intro h2{font-size:clamp(1.6rem,4vw,3.2rem);line-height:1.15;margin:.2rem 0 .6rem}
     .intro p{color:#3c4a5b}
     .intro .more{margin-top:1rem}
-    .intro .frame{border-radius:12px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+    .frame{border-radius:12px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.12)}
 
     /* ===== Stats band ===== */
     .stats-band{background:var(--navy);color:#fff;padding:3rem 0;text-align:center}
     .stats-band h3{margin:0 0 1rem;font-size:1.6rem}
     .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-    .stat .n{font-size:2rem;font-weight:900}
-    .stat .l{opacity:.8}
-
-    /* ===== Sections ===== */
-    section{padding:3.5rem 0}
-    .section-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}
-    .section-head h2{margin:0;font-size:2.2rem}
+    .stat .n{font-size:2.15rem;font-weight:900}
+    .stat .l{opacity:.85;margin-top:.35rem}
 
     /* ===== Services grid ===== */
     .services{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
@@ -139,10 +109,10 @@
     /* ===== CTA dark band ===== */
     .cta-band{background:var(--navy);color:#fff;padding:3.4rem 0}
     .cta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-    .cta-row h2{font-size:2.5rem;margin:0}
+    .cta-row h2{font-size:2.1rem;margin:0}
 
     /* ===== Why choose us ===== */
-    .why{background:#f3f6fb}
+    .why{background:var(--panel)}
     .why-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
     .why .point{display:flex;gap:.9rem;align-items:flex-start;padding:1rem;border-radius:12px;background:#fff;border:1px solid var(--border)}
     .why .dot{width:40px;height:40px;border-radius:999px;background:var(--yellow);display:grid;place-items:center;font-weight:900;color:#0b1f38}
@@ -157,47 +127,30 @@
     .float-wrap{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:.75rem;z-index:60}
     .toTop{width:56px;height:56px;border-radius:999px;display:grid;place-items:center;color:#111;font-weight:900;box-shadow:0 8px 24px rgba(0,0,0,.25);background:var(--yellow)}
 
-    /* ===== Mobile Nav (overlay) ===== */
-    #navlinks{transition:transform .25s ease, opacity .2s ease}
-    @media (max-width: 1024px){
-      nav ul{
-        position:fixed;top:64px;left:0;right:0;
-        background:rgba(10,26,50,.98);
-        backdrop-filter:saturate(180%) blur(10px);
-        flex-direction:column;gap:.75rem;padding:1rem 1.25rem 1.5rem;
-        transform:translateY(-8px);opacity:0;pointer-events:none;
-        border-bottom:1px solid rgba(255,255,255,.08);
-      }
-      nav ul.open{transform:translateY(0);opacity:1;pointer-events:auto}
-      nav a{color:#fff;padding:.6rem .4rem}
-      .burger{display:block}
-    }
+    /* ===== Reveal animation basics ===== */
+    .reveal{opacity:0;transform:translateY(18px);transition:transform .65s cubic-bezier(.2,.9,.2,1), opacity .5s ease;will-change:transform,opacity}
+    .reveal.revealed{opacity:1;transform:translateY(0)}
+    /* frame image transition */
+    .frame img{transform:translateY(20px) scale(.98);opacity:0;transition:transform .8s cubic-bezier(.2,.9,.2,1),opacity .6s ease}
+    .frame.revealed img{transform:translateY(0) scale(1);opacity:1}
 
-    /* ===== Responsive Grids & Sections ===== */
-    @media (max-width: 1024px){
+    /* optional small responsive adjustments */
+    @media (max-width:1024px){
       .features{grid-template-columns:1fr}
-      .features-wrap{transform:none;margin-top:-30px;margin-bottom:0}
       .intro-grid{grid-template-columns:1fr}
       .stats{grid-template-columns:1fr 1fr}
       .services{grid-template-columns:1fr 1fr}
       .projects{grid-template-columns:1fr}
       .why-grid{grid-template-columns:1fr}
-      .cta-row{flex-direction:column;align-items:flex-start}
     }
-    @media (max-width: 900px){
-      .cta-row h2{font-size:clamp(1.6rem,5.5vw,2.2rem)}
-    }
-    @media (max-width: 560px){
-      .services{grid-template-columns:1fr}
+    @media (max-width:560px){
       .stats{grid-template-columns:1fr}
-      .hero-inner{padding:5.5rem 0 5.5rem}
       .hero h1{font-size:clamp(2rem,9vw,3rem)}
-      .float-wrap{right:12px;bottom:12px}
-      .toTop{width:48px;height:48px}
+      .btn{padding:.6rem .8rem}
     }
 
-    /* Optional: prevent background scroll when mobile menu is open */
-    body.mobile-open{overflow:hidden}
+    /* accessibility focus outlines */
+    a:focus{outline:3px solid rgba(247,198,36,.35);outline-offset:2px}
   </style>
 </head>
 <body>
@@ -217,20 +170,9 @@
         </ul>
       </nav>
       <div class="nav-actions">
-  <a class="join" href="contact.html" style="
-      background:transparent;
-      color:#fff;
-      border:2px solid #fff;
-      padding:.7rem 1rem;
-      border-radius:8px;
-      font-weight:900;
-  ">SEND YOUR ENQUIRY</a>
-
-  <a class="join" href="masterclass.html">JOIN MASTERCLASS</a>
-
-  <button class="burger" id="burger" aria-label="Open menu">☰</button>
-</div>
-
+        <a class="join" href="contact.html" style="background:transparent;color:#fff;border:2px solid #fff;padding:.7rem 1rem;border-radius:8px;font-weight:900">SEND YOUR ENQUIRY</a>
+        <a class="join" href="masterclass.html">JOIN MASTERCLASS</a>
+      </div>
     </div>
   </header>
 
@@ -250,9 +192,9 @@
   <!-- ===== Overlapping features ===== -->
   <div class="container features-wrap">
     <div class="features" aria-label="Key pillars">
-      <article class="card"><div class="icon">💻</div><h3>CUTTING-EDGE DESIGN</h3><p>Comprehensive design and engineering services.</p></article>
-      <article class="card"><div class="icon">🔧</div><h3>PRECISION & RELIABILITY</h3><p>We focus on quality and efficiency in every project</p></article>
-      <article class="card"><div class="icon">🌲</div><h3>SUSTAINABLE SOLUTION</h3><p>Our commitment to sustainability in every project</p></article>
+      <article class="card reveal feature-card"><div class="icon">💻</div><h3>CUTTING-EDGE DESIGN</h3><p>Comprehensive design and engineering services.</p></article>
+      <article class="card reveal feature-card"><div class="icon">🔧</div><h3>PRECISION & RELIABILITY</h3><p>We focus on quality and efficiency in every project</p></article>
+      <article class="card reveal feature-card"><div class="icon">🌲</div><h3>SUSTAINABLE SOLUTION</h3><p>Our commitment to sustainability in every project</p></article>
     </div>
   </div>
 
@@ -265,7 +207,7 @@
         <p>At PT-EXPERT, we excel in providing expert solutions for post-tensioned slab systems. Our commitment to sustainability and efficiency drives our structural design services, specifically tailored to meet the individual needs of each client. From preliminary PT slab design to detailed design and drawings, we ensure robust assessment of existing slabs, innovative strengthening schemes, and thorough sustainability valuation. We are dedicated to delivering excellence in every project, ensuring your structures stand the test of time</p>
         <a class="btn primary more" href="services.html">MORE</a>
       </div>
-      <div class="frame" aria-hidden="true">
+      <div class="frame reveal">
         <img src="assets/1.png" alt="Post-tensioned slab rendering" />
       </div>
     </div>
@@ -275,10 +217,19 @@
   <section class="stats-band" aria-label="Key figures">
     <div class="container">
       <h3>We Make It Right To Guide Your Projects In A Proper Way.</h3>
-      <div class="stats">
-        <div class="stat"><div class="n">30+</div><div class="l">Successful Projects</div></div>
-        <div class="stat"><div class="n">5+</div><div class="l">Years of Experience</div></div>
-        <div class="stat"><div class="n">5+</div><div class="l">Dedicated Team</div></div>
+      <div class="stats" style="margin-top:1.1rem">
+        <div class="stat">
+          <div class="n" data-target="30">0</div>
+          <div class="l">Successful Projects</div>
+        </div>
+        <div class="stat">
+          <div class="n" data-target="5">0</div>
+          <div class="l">Years of Experience</div>
+        </div>
+        <div class="stat">
+          <div class="n" data-target="5">0</div>
+          <div class="l">Dedicated Team</div>
+        </div>
       </div>
     </div>
   </section>
@@ -291,12 +242,12 @@
         <a class="btn primary" href="services.html">VIEW MORE</a>
       </div>
       <div class="services">
-        <article class="service"><div class="badge">💻</div><h3>Preliminary PT Slab Design</h3><p>Kickstart your project with our expert preliminary design services</p></article>
-        <article class="service"><div class="badge">🛠️</div><h3>Detailed Design and Drawings</h3><p>Transform concepts into concrete realities with our detailed designs</p></article>
-        <article class="service"><div class="badge">📷</div><h3>Assessment of Existing Slabs</h3><p>Ensure the integrity of your structures with our thorough assessments and strengthening solutions</p></article>
-        <article class="service"><div class="badge">🪙</div><h3>Value Engineering for PT Slabs</h3><p>Optimize costs without compromising structural integrity</p></article>
-        <article class="service"><div class="badge">➡️</div><h3>Training and Workshops</h3><p>Enhance your team's expertise with tailored training and workshops</p></article>
-        <article class="service"><div class="badge">🧾</div><h3>Shop Drawings & Profile Generator</h3><p>Streamline design processes with our AutoCAD-based solutions.</p></article>
+        <article class="service reveal service-card"><div class="badge">💻</div><h3>Preliminary PT Slab Design</h3><p>Kickstart your project with our expert preliminary design services</p></article>
+        <article class="service reveal service-card"><div class="badge">🛠️</div><h3>Detailed Design and Drawings</h3><p>Transform concepts into concrete realities with our detailed designs</p></article>
+        <article class="service reveal service-card"><div class="badge">📷</div><h3>Assessment of Existing Slabs</h3><p>Ensure the integrity of your structures with our thorough assessments and strengthening solutions</p></article>
+        <article class="service reveal service-card"><div class="badge">🪙</div><h3>Value Engineering for PT Slabs</h3><p>Optimize costs without compromising structural integrity</p></article>
+        <article class="service reveal service-card"><div class="badge">➡️</div><h3>Training and Workshops</h3><p>Enhance your team's expertise with tailored training and workshops</p></article>
+        <article class="service reveal service-card"><div class="badge">🧾</div><h3>Shop Drawings & Profile Generator</h3><p>Streamline design processes with our AutoCAD-based solutions.</p></article>
       </div>
     </div>
   </section>
@@ -309,10 +260,10 @@
         <a class="btn primary" href="projects.html">VIEW MORE</a>
       </div>
       <div class="projects">
-        <figure class="project"><img src="assets/2.png" alt=""><figcaption>DETAILED DESIGN OF PROPOSED STUDENTS SCHOOL</figcaption></figure>
-        <figure class="project"><img src="assets/3.png" alt=""><figcaption>DETAILED DESIGN OF PROPOSED BUILDING AT BOMBAY</figcaption></figure>
-        <figure class="project"><img src="assets/4.png" alt=""><figcaption>INTERNAL MODIFICATION OF KIDS PLAY AREA</figcaption></figure>
-        <figure class="project"><img src="assets/5.png" alt=""><figcaption>PROPOSED HILTON HOTEL SAUDI ARABIA</figcaption></figure>
+        <figure class="project reveal"><img src="assets/2.png" alt="" class="thumb"><figcaption>DETAILED DESIGN OF PROPOSED STUDENTS SCHOOL</figcaption></figure>
+        <figure class="project reveal"><img src="assets/3.png" alt="" class="thumb"><figcaption>DETAILED DESIGN OF PROPOSED BUILDING AT BOMBAY</figcaption></figure>
+        <figure class="project reveal"><img src="assets/4.png" alt="" class="thumb"><figcaption>INTERNAL MODIFICATION OF KIDS PLAY AREA</figcaption></figure>
+        <figure class="project reveal"><img src="assets/5.png" alt="" class="thumb"><figcaption>PROPOSED HILTON HOTEL SAUDI ARABIA</figcaption></figure>
       </div>
     </div>
   </section>
@@ -333,9 +284,9 @@
       <div class="why-grid">
         <img src="assets/6.png" alt="Construction closeup" />
         <div class="points">
-          <div class="point"><div class="dot">✓</div><div><strong>Commitment to Excellence</strong><br/>Delivering high-quality post-tensioned concrete projects on time and within budget</div></div>
-          <div class="point"><div class="dot">✓</div><div><strong>Expert Team</strong><br/>Innovative solutions from a team of experts in post-tensioned concrete construction</div></div>
-          <div class="point"><div class="dot">✓</div><div><strong>Proven Expertise</strong><br/>Providing valuable insights for precise and efficient project execution</div></div>
+          <div class="point reveal"><div class="dot">✓</div><div><strong>Commitment to Excellence</strong><br/>Delivering high-quality post-tensioned concrete projects on time and within budget</div></div>
+          <div class="point reveal"><div class="dot">✓</div><div><strong>Expert Team</strong><br/>Innovative solutions from a team of experts in post-tensioned concrete construction</div></div>
+          <div class="point reveal"><div class="dot">✓</div><div><strong>Proven Expertise</strong><br/>Providing valuable insights for precise and efficient project execution</div></div>
         </div>
       </div>
     </div>
@@ -368,30 +319,101 @@
     </div>
   </footer>
 
-  <!-- Floaters: Back to top -->
+  <!-- Floaters -->
   <div class="float-wrap">
     <a class="toTop" href="index.html" aria-label="Back to top">↑</a>
   </div>
 
   <script>
-    // Mobile menu (overlay)
+    // ---- mobile menu (if you use it) ----
     const burger = document.getElementById('burger');
     const links  = document.getElementById('navlinks');
-
     function closeMenu(){ links.classList.remove('open'); document.body.classList.remove('mobile-open'); }
     function openMenu(){  links.classList.add('open');    document.body.classList.add('mobile-open'); }
-
-    burger?.addEventListener('click', ()=>{
-      const isOpen = links.classList.contains('open');
-      isOpen ? closeMenu() : openMenu();
-    });
-
-    // Close when a link is clicked or on Escape
+    burger?.addEventListener('click', ()=>{ const isOpen = links.classList.contains('open'); isOpen ? closeMenu() : openMenu(); });
     links?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
     window.addEventListener('keydown', e => { if(e.key === 'Escape') closeMenu(); });
-
-    // Year
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ===== Scroll reveal + stagger for cards ===== */
+    (function(){
+      const revealItems = document.querySelectorAll('.reveal');
+      if(!('IntersectionObserver' in window)){
+        // fallback: reveal all immediately
+        revealItems.forEach(el => el.classList.add('revealed'));
+        // if frame exists, reveal its img too
+        document.querySelectorAll('.frame').forEach(f => f.classList.add('revealed'));
+        return;
+      }
+
+      // create observer
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            const el = entry.target;
+            // if element belongs to a group (feature/service cards) we'll apply stagger
+            if(el.classList.contains('feature-card') || el.classList.contains('service-card')) {
+              // set a small delay using style.transitionDelay; we'll compute index-based delays
+              // find all siblings in the same group and set delays if not already set
+              const group = el.parentElement;
+              if(group){
+                const members = Array.from(group.querySelectorAll('.feature-card, .service-card'));
+                members.forEach((m, idx) => {
+                  // only apply if not already revealed and delay not set
+                  if(!m.classList.contains('revealed')){
+                    m.style.transitionDelay = (idx * 120) + 'ms'; // 120ms stagger
+                  }
+                });
+              }
+            }
+            // reveal
+            el.classList.add('revealed');
+            // if it's .frame, reveal image inside (CSS handles .frame.revealed img)
+            obs.unobserve(el);
+          }
+        });
+      }, {threshold: 0.14});
+
+      revealItems.forEach(el => io.observe(el));
+    })();
+
+    /* ===== Counters: animate when stats enter view ===== */
+    (function(){
+      const counters = document.querySelectorAll('.stat .n');
+      if(counters.length === 0) return;
+
+      function animateCounter(el, to, duration = 1600) {
+        const start = 0;
+        const startTime = performance.now();
+        function step(now){
+          const elapsed = now - startTime;
+          const t = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+          const value = Math.floor(start + (to - start) * eased);
+          el.textContent = value + (el.dataset.suffix || '');
+          if(t < 1) requestAnimationFrame(step);
+          else el.textContent = to + (el.dataset.suffix || '');
+        }
+        requestAnimationFrame(step);
+      }
+
+      const statsContainer = document.querySelector('.stats');
+      if(!statsContainer) return;
+      const obs = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            counters.forEach(c => {
+              const target = parseInt(c.getAttribute('data-target') || '0', 10);
+              // show plus sign (if you prefer no plus remove next line)
+              c.dataset.suffix = '+';
+              animateCounter(c, target, 1400);
+            });
+            observer.unobserve(statsContainer);
+          }
+        });
+      }, {threshold:0.3});
+      obs.observe(statsContainer);
+    })();
   </script>
 </body>
 </html>
