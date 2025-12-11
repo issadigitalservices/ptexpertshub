@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="noindex, nofollow">
   <meta charset="utf-8" />
   <title>Master Class Batch – PT Experts</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,10 +15,10 @@
     }
 
     .top-banner img{
-      width:100%;
-      display:block;
-      object-fit:cover;
-    }
+  width:100%;
+  display:block;
+}
+
 
     .page-wrap{
       max-width:1100px;
@@ -120,65 +120,90 @@
   <div class="page-wrap">
 
     <!-- TABS -->
-    <div class="tabs">
-      <div class="tab active" onclick="openTab(event, 'video')">Video Record</div>
-      <div class="tab" onclick="openTab(event, 'live')">Live Records</div>
-      <div class="tab" onclick="openTab(event, 'assign')">Assignments</div>
-      <div class="tab" onclick="openTab(event, 'material')">Course Material</div>
-      <div class="tab" onclick="openTab(event, 'software')">Software Downloads</div>
+    <div class="tabs" role="tablist" aria-label="Masterclass tabs">
+      <div class="tab active" role="tab" tabindex="0" onclick="openTab(event, 'video')">Recorded Classes</div>
+      <div class="tab" role="tab" tabindex="0" onclick="openTab(event, 'live')">Live Records</div>
+      <div class="tab" role="tab" tabindex="0" onclick="openTab(event, 'assign')">Assignments</div>
+      <div class="tab" role="tab" tabindex="0" onclick="openTab(event, 'material')">Course Material</div>
+      <div class="tab" role="tab" tabindex="0" onclick="openTab(event, 'software')">Software Downloads</div>
     </div>
 
-    <!-- VIDEO RECORDINGS -->
-    <div id="video" class="content active">
-      <h2>Video Recordings</h2>
+    <!-- RECORDED CLASSES (YouTube playlist) -->
+    <div id="video" class="content active" role="tabpanel">
+      <h2>Recorded Classes</h2>
       <p class="note">
-        YouTube playlist containing all available video lessons & batch recordings.
+        All recorded lessons and batch recordings are posted to the playlist below.
       </p>
 
       <div class="link-list">
-        <a class="btn-link" href="https://youtube.com/playlist?list=PLmEatxipq4NVgyn3iuNvI-uzCWZ2diAbU&si=XxtkwoIE7EVZwLPS" target="_blank" rel="noopener noreferrer">
-          <span>Open Video Playlist</span>
+        <a class="btn-link"
+           href="https://youtube.com/playlist?list=PLmEatxipq4NVgyn3iuNvI-uzCWZ2diAbU&si=XxtkwoIE7EVZwLPS"
+           target="_blank" rel="noopener noreferrer">
+          <span>Open Recorded Classes Playlist</span>
           <small>YouTube</small>
         </a>
       </div>
     </div>
 
     <!-- LIVE RECORDS -->
-    <div id="live" class="content">
+    <div id="live" class="content" role="tabpanel">
       <h2>Live Session Records</h2>
-      <p class="note">Links will appear here.</p>
+      <p class="note">Recorded live sessions (Google Drive folder).</p>
+
+      <div class="link-list">
+        <a class="btn-link"
+           href="https://drive.google.com/drive/folders/1KExaJ_pxHwtejeByqCuxhYXode0RI7oh"
+           target="_blank" rel="noopener noreferrer">
+          <span>Live Records Folder</span>
+          <small>Google Drive</small>
+        </a>
+      </div>
     </div>
 
     <!-- ASSIGNMENTS -->
-    <div id="assign" class="content">
+    <div id="assign" class="content" role="tabpanel">
       <h2>Assignments</h2>
       <p class="note">
         Download assignment documents from the link below. Use your registered Gmail to access.
       </p>
 
       <div class="link-list">
-        <a class="btn-link" href="https://drive.google.com/file/d/1e2q83GDcCMBBQJ3WrbGmZ03nqrF4SiFZ/view?usp=drivesdk" target="_blank" rel="noopener noreferrer">
-          <span>Assignment File</span>
+        <a class="btn-link"
+           href="https://drive.google.com/drive/folders/1FF2zZ6Qq-0jYJV0-y2ItkTBlYqikQwHe"
+           target="_blank" rel="noopener noreferrer">
+          <span>Assignments Folder</span>
+          <small>Google Drive</small>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- COURSE MATERIAL -->
+    <div id="material" class="content" role="tabpanel">
+      <h2>Course Material</h2>
+      <p class="note">Course notes, slides and resources (Google Drive folder).</p>
+
+      <div class="link-list">
+        <a class="btn-link"
+           href="https://drive.google.com/drive/folders/16WQuwRoVQXVNg6POcZMAB4Jvcf51bpv4"
+           target="_blank" rel="noopener noreferrer">
+          <span>Course Material Folder</span>
           <small>Google Drive</small>
         </a>
       </div>
     </div>
 
-    <!-- COURSE MATERIAL -->
-    <div id="material" class="content">
-      <h2>Course Material</h2>
-      <p class="note">Links will appear here.</p>
-    </div>
-
     <!-- SOFTWARE DOWNLOADS -->
-    <div id="software" class="content">
+    <div id="software" class="content" role="tabpanel">
       <h2>Software Downloads</h2>
       <p class="note">
         Tools & PT-related software required for this course.
       </p>
 
       <div class="link-list">
-        <a class="btn-link" href="https://drive.google.com/drive/folders/1FF2zZ6Qq-0jYJV0-y2ItkTBlYqikQwHe" target="_blank" rel="noopener noreferrer">
+        <a class="btn-link"
+           href="https://drive.google.com/file/d/1e2q83GDcCMBBQJ3WrbGmZ03nqrF4SiFZ/view?usp=drivesdk"
+           target="_blank" rel="noopener noreferrer">
           <span>Software Downloads Folder</span>
           <small>Google Drive</small>
         </a>
@@ -189,12 +214,36 @@
 
 <script>
 function openTab(evt, tabId){
+  // remove active state
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
 
+  // set selected
   evt.target.classList.add('active');
   document.getElementById(tabId).classList.add('active');
+
+  // for accessibility, move focus to the panel
+  document.getElementById(tabId).focus();
 }
+
+// enable keyboard navigation on tabs (left/right/enter)
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('keydown', (e) => {
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const idx = tabs.indexOf(e.target);
+    if (e.key === 'ArrowRight') {
+      const next = tabs[(idx + 1) % tabs.length];
+      next.focus();
+      next.click();
+    } else if (e.key === 'ArrowLeft') {
+      const prev = tabs[(idx - 1 + tabs.length) % tabs.length];
+      prev.focus();
+      prev.click();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.target.click();
+    }
+  });
+});
 </script>
 
 </body>
