@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+  <meta charset="utf-8" />
+  <title>Master Class Batch – PT Experts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif;
+      background:#f4f7fb;
+      color:#0f172a;
+    }
+
+    .top-banner img{
+      width:100%;
+      display:block;
+      object-fit:cover;
+    }
+
+    .page-wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 1rem 3rem;
+    }
+
+    .tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      padding:15px 0;
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:#f4f7fb;
+    }
+    .tab{
+      padding:10px 15px;
+      border-radius:999px;
+      background:#e3e8ef;
+      cursor:pointer;
+      font-weight:700;
+      font-size:.95rem;
+      border:1px solid #cbd5e1;
+      white-space:nowrap;
+    }
+    .tab.active{
+      background:#0a1a32;
+      color:white;
+      border-color:#0a1a32;
+    }
+
+    .content{
+      padding:18px 0;
+      display:none;
+    }
+    .content.active{
+      display:block;
+    }
+
+    h2{
+      margin-top:0;
+      font-size:1.3rem;
+    }
+
+    .note{
+      font-size:.9rem;
+      color:#64748b;
+      margin-bottom:1rem;
+    }
+
+    .link-list{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .btn-link{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 14px;
+      border-radius:10px;
+      background:white;
+      border:1px solid #d4d4d8;
+      font-size:.95rem;
+      text-decoration:none;
+      color:#0f172a;
+      box-shadow:0 2px 6px rgba(15,23,42,.06);
+    }
+    .btn-link span{
+      font-weight:600;
+    }
+    .btn-link small{
+      font-size:.8rem;
+      color:#6b7280;
+    }
+
+    .btn-link:hover{
+      border-color:#0a1a32;
+    }
+
+    @media (max-width:700px){
+      .link-list{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP IMAGE -->
+  <div class="top-banner">
+    <img src="/assets/m1.jpg" alt="MasterClass Banner">
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" onclick="openTab(event, 'video')">Video Record</div>
+      <div class="tab" onclick="openTab(event, 'live')">Live Records</div>
+      <div class="tab" onclick="openTab(event, 'assign')">Assignments</div>
+      <div class="tab" onclick="openTab(event, 'material')">Course Material</div>
+      <div class="tab" onclick="openTab(event, 'software')">Software Downloads</div>
+    </div>
+
+    <!-- VIDEO RECORDINGS -->
+    <div id="video" class="content active">
+      <h2>Video Recordings</h2>
+      <p class="note">
+        YouTube playlist containing all available video lessons & batch recordings.
+      </p>
+
+      <div class="link-list">
+        <a class="btn-link" href="https://youtube.com/playlist?list=PLmEatxipq4NVgyn3iuNvI-uzCWZ2diAbU&si=XxtkwoIE7EVZwLPS" target="_blank" rel="noopener noreferrer">
+          <span>Open Video Playlist</span>
+          <small>YouTube</small>
+        </a>
+      </div>
+    </div>
+
+    <!-- LIVE RECORDS -->
+    <div id="live" class="content">
+      <h2>Live Session Records</h2>
+      <p class="note">Links will appear here.</p>
+    </div>
+
+    <!-- ASSIGNMENTS -->
+    <div id="assign" class="content">
+      <h2>Assignments</h2>
+      <p class="note">
+        Download assignment documents from the link below. Use your registered Gmail to access.
+      </p>
+
+      <div class="link-list">
+        <a class="btn-link" href="https://drive.google.com/file/d/1e2q83GDcCMBBQJ3WrbGmZ03nqrF4SiFZ/view?usp=drivesdk" target="_blank" rel="noopener noreferrer">
+          <span>Assignment File</span>
+          <small>Google Drive</small>
+        </a>
+      </div>
+    </div>
+
+    <!-- COURSE MATERIAL -->
+    <div id="material" class="content">
+      <h2>Course Material</h2>
+      <p class="note">Links will appear here.</p>
+    </div>
+
+    <!-- SOFTWARE DOWNLOADS -->
+    <div id="software" class="content">
+      <h2>Software Downloads</h2>
+      <p class="note">
+        Tools & PT-related software required for this course.
+      </p>
+
+      <div class="link-list">
+        <a class="btn-link" href="https://drive.google.com/drive/folders/1FF2zZ6Qq-0jYJV0-y2ItkTBlYqikQwHe" target="_blank" rel="noopener noreferrer">
+          <span>Software Downloads Folder</span>
+          <small>Google Drive</small>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+function openTab(evt, tabId){
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+
+  evt.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+</script>
+
+</body>
+</html>
