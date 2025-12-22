@@ -26,14 +26,41 @@
     .muted{color:var(--muted)}
 
     /* ===== Header (shared) ===== */
-    header{position:sticky;top:0;z-index:50;background:rgba(10,26,50,.92);backdrop-filter:blur(8px)}
+    header{
+      position:fixed;top:0;left:0;right:0;z-index:999;
+      background:rgba(10,26,50,.95);backdrop-filter:saturate(180%) blur(12px);
+    }
     .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;min-height:64px}
     .brand{display:flex;align-items:center;gap:.75rem}
-    .logo{width:190px;height:44px;background-image:url('assets/logo.png');background-size:contain;background-repeat:no-repeat;background-position:left center}
-    nav ul{list-style:none;display:flex;gap:1rem;margin:0;padding:0}
-    nav a{color:#dbe7ff;padding:.4rem .6rem;border-radius:8px;font-weight:700}
-    .join{background:var(--yellow);color:#111;padding:.6rem .9rem;border-radius:8px;font-weight:900}
+    .logo{width:200px;height:52px;border-radius:2px;background-image:url('assets/22oldlogo.png');background-size:contain;background-repeat:no-repeat;background-position:left center;border:0}
+    .brand .name{display:none}
+    nav ul{list-style:none;display:flex;gap:1.2rem;margin:0;padding:0}
+    nav a{
+  color:#dbe7ff;
+  padding:.4rem .6rem;
+  border-radius:8px;
+  font-weight:700;
+  font-size:1.05rem; /* desktop */
+}
+
+    nav a:hover{background:rgba(255,255,255,.08)}
+    .nav-actions{display:flex;gap:.6rem;align-items:center}
+    .join{background:var(--yellow);color:#1a1a1a;padding:.7rem 1rem;border-radius:8px;font-weight:900}
     .burger{display:none;background:none;border:0;color:#fff;font-size:1.5rem}
+
+    .enquiry-btn{
+  background:#c7400a;   /* 🔵 dark blue (you can change) */
+  color:#fff;
+  border:2px solid #1e3a8a;
+  padding:.7rem 1rem;
+  border-radius:8px;
+  font-weight:900;
+}
+
+.enquiry-btn:hover{
+  background:#0f2a66;
+  border-color:#0f2a66;
+}
 
     /* ===== Page hero ===== */
     .page-hero{padding:4.5rem 0 2rem}
@@ -129,9 +156,16 @@
     cursor:pointer;
   }
 
-  .nav-actions{
-    gap:.5rem;
-  }
+  .nav{
+  min-height:64px;
+}
+
+.nav-actions{
+  display:flex;
+  gap:.6rem;
+  align-items:center;
+}
+
 
   .join{
     width:100%;
