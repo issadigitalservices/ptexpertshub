@@ -165,13 +165,24 @@
     /* ===== MOBILE RESPONSIVE NAV ===== */
 @media (max-width: 768px){
 
+  /* sync body padding with header */
   body{
-    padding-top:70px;
+    padding-top:64px;
   }
 
+  /* fixed header height on mobile */
+  header{
+    height:64px;
+  }
+
+  .nav{
+    min-height:64px;
+  }
+
+  /* mobile dropdown nav */
   nav{
     position:fixed;
-    top:70px;
+    top:64px;
     left:0;
     right:0;
     background:rgba(10,26,50,.98);
@@ -193,13 +204,14 @@
   nav a{
     display:block;
     padding:1rem;
-    font-size:1.15rem; /* mobile size */
+    font-size:1.15rem;
   }
 
   nav.open{
     transform:translateY(0);
   }
 
+  /* burger icon */
   .burger{
     display:block;
     font-size:1.8rem;
@@ -209,9 +221,20 @@
     cursor:pointer;
   }
 
+  /* compact both buttons (CLIENT WANTS BOTH) */
   .nav-actions{
-    gap:.5rem;
+    gap:.35rem;
+    align-items:center;
   }
+
+  .nav-actions a.join{
+    padding:.45rem .6rem;
+    font-size:.72rem;
+    line-height:1.1;
+    white-space:nowrap;
+  }
+
+}
 
   .join{
     width:100%;
