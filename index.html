@@ -241,53 +241,29 @@
   }
 }
 
-/* ===== FINAL MOBILE OVERLAP FIX ===== */
+/* ===== CLEAN MOBILE FIX (FINAL) ===== */
 @media (max-width: 768px){
 
-  /* Push hero below fixed header */
-  .hero{
+  header{
+    height:72px;
+  }
+
+  body{
     padding-top:72px;
   }
 
-  /* Neutralize hero-inner top padding on mobile */
-  .hero-inner{
-    padding-top:3.5rem;   /* was effectively too large */
-  }
-
-  /* Reduce upward pull of feature cards */
+  /* STOP overlap on mobile */
   .features-wrap{
-    transform:none;       /* STOP pulling into hero */
+    transform:none;
     margin-top:1.5rem;
     margin-bottom:1.5rem;
   }
 
-}
-
-/* ===== FINAL MOBILE HERO FIX (FORCED) ===== */
-@media (max-width: 768px){
-
-  /* Force space below fixed header */
-  header{
-    height:72px !important;
+  /* Hero spacing correction */
+  .hero-inner{
+    padding-top:3.5rem;
+    padding-bottom:4rem;
   }
-
-  body{
-    padding-top:72px !important;
-  }
-
-  /* Push hero fully below header */
-  .hero{
-    margin-top:72px !important;
-    padding-top:0 !important;
-  }
-
-  /* Stop cards from overlapping hero */
-  .features-wrap{
-    transform:none !important;
-    margin-top:1.5rem !important;
-    margin-bottom:1.5rem !important;
-  }
-
 }
 
 
