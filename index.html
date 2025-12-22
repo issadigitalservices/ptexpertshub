@@ -48,7 +48,14 @@
     .logo{width:200px;height:52px;border-radius:2px;background-image:url('assets/22oldlogo.png');background-size:contain;background-repeat:no-repeat;background-position:left center;border:0}
     .brand .name{display:none}
     nav ul{list-style:none;display:flex;gap:1.2rem;margin:0;padding:0}
-    nav a{color:#dbe7ff;padding:.4rem .6rem;border-radius:8px;font-weight:700;font-size:1.45rem}
+    nav a{
+  color:#dbe7ff;
+  padding:.4rem .6rem;
+  border-radius:8px;
+  font-weight:700;
+  font-size:1.05rem; /* desktop */
+}
+
     nav a:hover{background:rgba(255,255,255,.08)}
     .nav-actions{display:flex;gap:.6rem;align-items:center}
     .join{background:var(--yellow);color:#1a1a1a;padding:.7rem 1rem;border-radius:8px;font-weight:900}
@@ -165,6 +172,64 @@
 
     /* accessibility focus outlines */
     a:focus{outline:3px solid rgba(247,198,36,.35);outline-offset:2px}
+
+    /* ===== MOBILE RESPONSIVE NAV ===== */
+@media (max-width: 768px){
+
+  body{
+    padding-top:70px;
+  }
+
+  nav{
+    position:fixed;
+    top:70px;
+    left:0;
+    right:0;
+    background:rgba(10,26,50,.98);
+    transform:translateY(-120%);
+    transition:transform .35s ease;
+    z-index:998;
+  }
+
+  nav ul{
+    flex-direction:column;
+    gap:0;
+    padding:0.5rem 1rem;
+  }
+
+  nav li{
+    border-bottom:1px solid rgba(255,255,255,.15);
+  }
+
+  nav a{
+    display:block;
+    padding:1rem;
+    font-size:1.15rem; /* mobile size */
+  }
+
+  nav.open{
+    transform:translateY(0);
+  }
+
+  .burger{
+    display:block;
+    font-size:1.8rem;
+    color:#fff;
+    background:none;
+    border:none;
+    cursor:pointer;
+  }
+
+  .nav-actions{
+    gap:.5rem;
+  }
+
+  .join{
+    width:100%;
+    text-align:center;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -175,7 +240,7 @@
         <span class="logo" aria-hidden="true"></span>
         <strong class="name">PTEXPERTS</strong>
       </a>
-      <nav aria-label="Main">
+      <nav aria-label="Main" id="navlinks">
         <ul id="navlinks">
           <li><a href="#home">Home</a></li>
           <li><a href="about.html">About</a></li>
@@ -184,9 +249,11 @@
         </ul>
       </nav>
       <div class="nav-actions">
-        <a class="join enquiry-btn" href="contact.html">SEND YOUR ENQUIRY</a>
-        <a class="join" href="masterclass.html">JOIN MASTERCLASS</a>
-      </div>
+  <button class="burger" id="burger" aria-label="Open menu">☰</button>
+  <a class="join enquiry-btn" href="contact.html">SEND YOUR ENQUIRY</a>
+  <a class="join" href="masterclass.html">JOIN MASTERCLASS</a>
+</div>
+
     </div>
   </header>
 
