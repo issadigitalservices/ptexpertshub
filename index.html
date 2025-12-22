@@ -163,83 +163,21 @@
     a:focus{outline:3px solid rgba(247,198,36,.35);outline-offset:2px}
 
     /* ===== MOBILE RESPONSIVE NAV (FIXED) ===== */
-@media (max-width: 768px){
+@media (max-width:768px){
 
-  /* Correct body offset for fixed header */
-  body{
-    padding-top:72px;   /* FIX: matches real header height */
+  /* Push hero below fixed header */
+  .hero{
+    padding-top:80px;
   }
 
-  /* Fixed header height */
-  header{
-    height:72px;
-  }
-
-  .nav{
-    min-height:72px;
-  }
-
-  /* Dropdown nav */
-  nav{
-    position:fixed;
-    top:72px;           /* FIX */
-    left:0;
-    right:0;
-    background:rgba(10,26,50,.98);
-    transform:translateY(-120%);
-    transition:transform .35s ease;
-    z-index:998;
-  }
-
-  nav ul{
-    flex-direction:column;
-    gap:0;
-    padding:0.5rem 1rem;
-  }
-
-  nav li{
-    border-bottom:1px solid rgba(255,255,255,.15);
-  }
-
-  nav a{
-    display:block;
-    padding:1rem;
-    font-size:1.15rem;
-  }
-
-  nav.open{
-    transform:translateY(0);
-  }
-
-  /* Burger icon */
-  .burger{
-    display:block;
-    font-size:1.8rem;
-    color:#fff;
-    background:none;
-    border:none;
-    cursor:pointer;
-  }
-
-  /* Client wants BOTH buttons */
-  .nav-actions{
-    gap:.35rem;
-    align-items:center;
-  }
-
-  .nav-actions a.join{
-    padding:.45rem .6rem;
-    font-size:.72rem;
-    line-height:1.1;
-    white-space:nowrap;
-  }
-
-  /* FIX: Remove excessive overlap on mobile */
+  /* Reduce aggressive overlap only on mobile */
   .features-wrap{
-    transform:translateY(-40px);  /* was -90px */
+    transform:translateY(-40px);
     margin-bottom:-20px;
   }
+
 }
+
 
   .join{
     width:100%;
