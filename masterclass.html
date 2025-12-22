@@ -81,6 +81,63 @@
       .details{grid-template-columns:1fr}
       .hero-inner h1{font-size:2rem}
     }
+
+    /* ===== MOBILE RESPONSIVE NAV ===== */
+@media (max-width: 768px){
+
+  body{
+    padding-top:70px;
+  }
+
+  nav{
+    position:fixed;
+    top:70px;
+    left:0;
+    right:0;
+    background:rgba(10,26,50,.98);
+    transform:translateY(-120%);
+    transition:transform .35s ease;
+    z-index:998;
+  }
+
+  nav ul{
+    flex-direction:column;
+    gap:0;
+    padding:0.5rem 1rem;
+  }
+
+  nav li{
+    border-bottom:1px solid rgba(255,255,255,.15);
+  }
+
+  nav a{
+    display:block;
+    padding:1rem;
+    font-size:1.15rem; /* mobile size */
+  }
+
+  nav.open{
+    transform:translateY(0);
+  }
+
+  .burger{
+    display:block;
+    font-size:1.8rem;
+    color:#fff;
+    background:none;
+    border:none;
+    cursor:pointer;
+  }
+
+  .nav-actions{
+    gap:.5rem;
+  }
+
+  .join{
+    width:100%;
+    text-align:center;
+  }
+}
   </style>
 </head>
 <body>
