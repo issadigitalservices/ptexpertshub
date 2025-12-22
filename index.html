@@ -263,6 +263,33 @@
 
 }
 
+/* ===== FINAL MOBILE HERO FIX (FORCED) ===== */
+@media (max-width: 768px){
+
+  /* Force space below fixed header */
+  header{
+    height:72px !important;
+  }
+
+  body{
+    padding-top:72px !important;
+  }
+
+  /* Push hero fully below header */
+  .hero{
+    margin-top:72px !important;
+    padding-top:0 !important;
+  }
+
+  /* Stop cards from overlapping hero */
+  .features-wrap{
+    transform:none !important;
+    margin-top:1.5rem !important;
+    margin-bottom:1.5rem !important;
+  }
+
+}
+
 
   .join{
     width:100%;
