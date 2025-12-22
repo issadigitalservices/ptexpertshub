@@ -266,6 +266,28 @@
   }
 }
 
+/* ===== ABSOLUTE MOBILE FIX (NO CLASS DEPENDENCY) ===== */
+@media (max-width: 768px){
+
+  /* Correct spacing for fixed header */
+  body{
+    padding-top:72px;
+  }
+
+  /* Push FIRST section below header */
+  header + *{
+    margin-top:72px;
+  }
+
+  /* Disable overlap tricks on mobile */
+  [class*="features"]{
+    transform:none !important;
+    margin-top:1.5rem !important;
+    margin-bottom:1.5rem !important;
+  }
+
+}
+
 
   .join{
     width:100%;
