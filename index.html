@@ -162,27 +162,27 @@
     /* accessibility focus outlines */
     a:focus{outline:3px solid rgba(247,198,36,.35);outline-offset:2px}
 
-    /* ===== MOBILE RESPONSIVE NAV ===== */
+    /* ===== MOBILE RESPONSIVE NAV (FIXED) ===== */
 @media (max-width: 768px){
 
-  /* sync body padding with header */
+  /* Correct body offset for fixed header */
   body{
-    padding-top:64px;
+    padding-top:72px;   /* FIX: matches real header height */
   }
 
-  /* fixed header height on mobile */
+  /* Fixed header height */
   header{
-    height:64px;
+    height:72px;
   }
 
   .nav{
-    min-height:64px;
+    min-height:72px;
   }
 
-  /* mobile dropdown nav */
+  /* Dropdown nav */
   nav{
     position:fixed;
-    top:64px;
+    top:72px;           /* FIX */
     left:0;
     right:0;
     background:rgba(10,26,50,.98);
@@ -211,7 +211,7 @@
     transform:translateY(0);
   }
 
-  /* burger icon */
+  /* Burger icon */
   .burger{
     display:block;
     font-size:1.8rem;
@@ -221,7 +221,7 @@
     cursor:pointer;
   }
 
-  /* compact both buttons (CLIENT WANTS BOTH) */
+  /* Client wants BOTH buttons */
   .nav-actions{
     gap:.35rem;
     align-items:center;
@@ -234,13 +234,17 @@
     white-space:nowrap;
   }
 
+  /* FIX: Remove excessive overlap on mobile */
+  .features-wrap{
+    transform:translateY(-40px);  /* was -90px */
+    margin-bottom:-20px;
+  }
 }
 
   .join{
     width:100%;
     text-align:center;
   }
-}
 
 .section-footer{
   display:flex;
