@@ -2,44 +2,198 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PT Experts – Masterclass</title>
+<title>PT Experts – Masterclass Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "ptexpertshub-b785e.firebaseapp.com",
-  projectId: "ptexpertshub-b785e"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-onAuthStateChanged(auth,user=>{
-  if(!user) location.href="masterclass_login.html";
-});
-
-window.logout=()=>{
-  signOut(auth).then(()=>location.href="masterclass_login.html");
-};
-</script>
-
 <style>
-body{font-family:system-ui;background:#f4f7fb;margin:0}
-.wrap{max-width:900px;margin:2rem auto;padding:1rem}
-button{padding:.6rem 1rem;background:#facc15;border:none;font-weight:700}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:#f4f7fb;
+}
+header{
+  background:#0a1a32;
+  color:#fff;
+  padding:1rem 1.5rem;
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:1.5rem;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1rem;
+}
+.card{
+  background:#fff;
+  padding:1.25rem;
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+.card h3{margin-top:0}
+.logout{
+  float:right;
+  cursor:pointer;
+  font-weight:600;
+  color:#facc15;
+}
+.hidden{display:none}
+.loading{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.1rem;
+  color:#64748b;
+}
 </style>
 </head>
 
 <body>
-<div class="wrap">
-  <h2>Welcome to Masterclass</h2>
-  <p>Week-wise content will unlock here.</p>
 
-  <button onclick="logout()">Logout</button>
+<!-- LOADING -->
+<div id="loading" class="loading">
+  Checking access…
 </div>
+
+<!-- CONTENT -->
+<div id="content" class="hidden">
+
+<header>
+  <span>PT Experts – Masterclass</span>
+  <div>
+    <span id="adminBtn"
+          style="display:none; margin-right:15px; cursor:pointer; color:#22c55e; font-weight:600"
+          onclick="location.href='masterclass_admin.html'">
+      Admin Panel
+    </span>
+    <span class="logout" onclick="logout()">Logout</span>
+  </div>
+</header>
+
+
+<div class="container">
+
+  <h2>Welcome to the Masterclass</h2>
+  <p>You now have full access to the course materials.</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>📹 Recorded Classes</h3>
+      <ul>
+        <li>Week 1 – Introduction</li>
+        <li>Week 2 – Core Concepts</li>
+        <li>Week 3 – Practical Session</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📂 Course Materials</h3>
+      <ul>
+        <li>PDF Notes</li>
+        <li>Reference Files</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📝 Assignments</h3>
+      <ul>
+        <li>Assignment 1</li>
+        <li>Assignment 2</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>⬇️ Software Downloads</h3>
+      <ul>
+        <li>Required Tools</li>
+        <li>Sample Files</li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<script type="module">
+/* ---------------- FIREBASE IMPORTS ---------------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ---------------- FIREBASE CONFIG ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyBzxaMy53uTRYTc10I777TQwnJekWyujUg",
+  authDomain: "ptexpertshub-b785e.firebaseapp.com",
+  projectId: "ptexpertshub-b785e"
+};
+
+/* ---------------- INIT ---------------- */
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ---------------- ACCESS CHECK ---------------- */
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    location.href = "masterclass_login.html";
+    return;
+  }
+
+  try {
+    // Check user document
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if (!userSnap.exists()) {
+      await signOut(auth);
+      location.href = "masterclass_login.html";
+      return;
+    }
+
+    // Check paid access
+    if (userSnap.data().paid === true) {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("content").classList.remove("hidden");
+
+      // ✅ ADMIN CHECK (CORRECT PLACE)
+      const adminSnap = await getDoc(doc(db, "admins", user.uid));
+      if (adminSnap.exists()) {
+        document.getElementById("adminBtn").style.display = "inline";
+      }
+
+    } else {
+      alert("Your access is not approved yet.");
+      await signOut(auth);
+      location.href = "masterclass_login.html";
+    }
+
+  } catch (e) {
+    console.error(e);
+    await signOut(auth);
+    location.href = "masterclass_login.html";
+  }
+});
+
+/* ---------------- LOGOUT ---------------- */
+window.logout = async () => {
+  await signOut(auth);
+  location.href = "masterclass_login.html";
+};
+</script>
+
+
 </body>
 </html>
