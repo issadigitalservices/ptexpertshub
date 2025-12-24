@@ -14,7 +14,6 @@
       color:#0f172a;
       line-height:1.65;
       background:#fff;
-      padding-top:80px; /* room for fixed header */
     }
     img{max-width:100%;height:auto;display:block}
     a{text-decoration:none;color:inherit}
@@ -158,6 +157,12 @@
       .hero h1{font-size:clamp(2rem,9vw,3rem)}
       .btn{padding:.6rem .8rem}
     }
+
+    @media (max-width: 768px){
+  body{
+    padding-top:72px;   /* exact header height */
+  }
+}
 
     /* accessibility focus outlines */
     a:focus{outline:3px solid rgba(247,198,36,.35);outline-offset:2px}
@@ -471,7 +476,7 @@
       <h1>Sustainable<br/>Structural Solutions</h1>
       <p>Innovative structural design solutions for post-tensioned slab systems.</p>
       <div class="cta">
-        <a class="btn primary" href="projects.html">PROJECTS</a>
+        <a class="btn primary" href="projects.html">PROJECTSs</a>
         <a class="btn outline" href="services.html">SERVICES</a>
       </div>
     </div>
