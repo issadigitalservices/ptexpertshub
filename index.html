@@ -89,7 +89,11 @@ nav a:hover{background:rgba(255,255,255,.08)}
 .hero p{max-width:860px;color:#d8e6ff;font-size:1.15rem}
 
 /* ===== Features ===== */
-.features-wrap{transform:translateY(-90px);margin-bottom:-60px}
+.features-wrap{
+  margin-top:2rem;
+  margin-bottom:2rem;
+}
+
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
 .card{
   background:#fff;
@@ -200,6 +204,13 @@ footer{background:var(--navy);color:#d9e6ff}
   .nav-actions .join{
     font-size:.65rem;
     padding:.4rem .55rem;
+  }
+}
+
+/* Hide page title bar on mobile */
+@media (max-width:768px){
+  .section-head{
+    display:none !important;
   }
 }
 
