@@ -241,17 +241,6 @@
   }
 }
 
-/* ===== CLEAN MOBILE FIX (FINAL) ===== */
-@media (max-width: 768px){
-
-  header{
-    height:72px;
-  }
-
-  body{
-    padding-top:72px;
-  }
-
   /* STOP overlap on mobile */
   .features-wrap{
     transform:none;
@@ -264,10 +253,8 @@
     padding-top:3.5rem;
     padding-bottom:4rem;
   }
-}
 
-/* ===== ABSOLUTE MOBILE FIX (NO CLASS DEPENDENCY) ===== */
-@media (max-width: 768px){
+
 
   /* Correct spacing for fixed header */
   body{
@@ -286,18 +273,12 @@
     margin-bottom:1.5rem !important;
   }
 
-}
-/* ===== MOBILE: PUSH FEATURES BELOW SEND YOUR ENQUIRY ===== */
-@media (max-width: 768px){
-
   /* Force feature section to start lower */
   .features,
   .features-wrap{
     margin-top:120px !important;
     transform:none !important;
   }
-
-}
 
   .join{
     width:100%;
@@ -309,6 +290,151 @@
   justify-content:center;
   margin-top:1.5rem;
 }
+
+/* ===============================
+   FINAL MOBILE RESPONSIVE FIX
+================================ */
+@media (max-width: 768px){
+
+  /* ----- Header ----- */
+  header{
+    height:72px;
+  }
+
+  body{
+    padding-top:72px;
+  }
+
+  .nav{
+    min-height:72px;
+  }
+
+  /* Mobile menu */
+  nav{
+    position:fixed;
+    top:72px;
+    left:0;
+    right:0;
+    background:rgba(10,26,50,.98);
+    transform:translateY(-120%);
+    transition:transform .35s ease;
+    z-index:998;
+  }
+
+  nav.open{
+    transform:translateY(0);
+  }
+
+  nav ul{
+    flex-direction:column;
+    padding:.5rem 1rem;
+  }
+
+  nav li{
+    border-bottom:1px solid rgba(255,255,255,.15);
+  }
+
+  nav a{
+    padding:1rem;
+    font-size:1.1rem;
+  }
+
+  .burger{
+    display:block;
+    font-size:1.8rem;
+    color:#fff;
+    background:none;
+    border:none;
+  }
+
+  /* Header buttons */
+  .nav-actions{
+    gap:.35rem;
+  }
+
+  .nav-actions .join{
+    padding:.45rem .6rem;
+    font-size:.7rem;
+    white-space:nowrap;
+  }
+
+  /* ----- Hero ----- */
+  .hero-inner{
+    padding:3.5rem 0 4rem;
+  }
+
+  .hero h1{
+    font-size:clamp(2rem,9vw,3rem);
+  }
+
+  .hero p{
+    font-size:1rem;
+  }
+
+  /* ----- Features (NO overlap on mobile) ----- */
+  .features-wrap{
+    transform:none;
+    margin:1.5rem auto;
+  }
+
+  .features{
+    grid-template-columns:1fr;
+  }
+
+  /* ----- Intro ----- */
+  .intro-grid{
+    grid-template-columns:1fr;
+    gap:1.5rem;
+    text-align:center;
+  }
+
+  .intro .more{
+    margin-inline:auto;
+  }
+
+  /* ----- Stats ----- */
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  /* ----- Services ----- */
+  .services{
+    grid-template-columns:1fr;
+  }
+
+  /* ----- Projects ----- */
+  .projects{
+    grid-template-columns:1fr;
+  }
+
+  /* ----- CTA Band ----- */
+  .cta-row{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .cta-row h2{
+    font-size:1.6rem;
+  }
+
+  /* ----- Why section ----- */
+  .why-grid{
+    grid-template-columns:1fr;
+    gap:1.5rem;
+  }
+
+  /* Footer */
+  .footer-grid{
+    grid-template-columns:1fr;
+    gap:1.5rem;
+    text-align:center;
+  }
+
+  .foot-logo{
+    justify-content:center;
+  }
+}
+
 
   </style>
 </head>
