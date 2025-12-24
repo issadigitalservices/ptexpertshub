@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel – PT Experts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{font-family:system-ui;background:#f4f7fb;margin:0}
+.container{max-width:900px;margin:2rem auto;padding:1rem}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{padding:.6rem;border-bottom:1px solid #ddd}
+th{background:#0a1a32;color:#fff}
+button{padding:.3rem .6rem}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h2>Admin Panel</h2>
+<table>
+<thead>
+<tr><th>Email</th><th>Status</th><th>Action</th></tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "ptexpertshub-b785e.firebaseapp.com",
+  projectId: "ptexpertshub-b785e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth,async user=>{
+  if(!user) return location.href="masterclass_login.html";
+  const adminDoc=await getDoc(doc(db,"admins",user.uid));
+  if(!adminDoc.exists()){
+    alert("Access denied");
+    return;
+  }
+  loadUsers();
+});
+
+async function loadUsers(){
+  const snap=await getDocs(collection(db,"users"));
+  const rows=document.getElementById("rows");
+  rows.innerHTML="";
+  snap.forEach(d=>{
+    const u=d.data();
+    rows.innerHTML+=`
+      <tr>
+        <td>${u.email}</td>
+        <td>${u.paid?"PAID":"UNPAID"}</td>
+        <td>
+          <button onclick="setPaid('${d.id}',${!u.paid})">
+            ${u.paid?"Unpay":"Mark Paid"}
+          </button>
+        </td>
+      </tr>`;
+  });
+}
+
+window.setPaid=async(uid,val)=>{
+  await updateDoc(doc(db,"users",uid),{paid:val});
+  loadUsers();
+};
+</script>
+</body>
+</html>

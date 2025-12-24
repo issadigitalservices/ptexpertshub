@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login – PT Experts Masterclass</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0a1a32;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+}
+.box{
+  background:#fff;
+  padding:2rem;
+  border-radius:14px;
+  width:100%;
+  max-width:360px;
+}
+h2{text-align:center;}
+input,button{
+  width:100%;
+  padding:.7rem;
+  margin:.5rem 0;
+}
+button{
+  background:#facc15;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+}
+.toggle{text-align:center;cursor:pointer;color:#2563eb}
+.msg{text-align:center;color:#dc2626;font-size:.85rem}
+</style>
+</head>
+
+<body>
+<div class="box">
+  <h2 id="title">Login</h2>
+
+  <input id="name" placeholder="Full Name" style="display:none">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="submitForm()">Continue</button>
+  <div class="toggle" onclick="toggleMode()">New user? Create account</div>
+  <div class="msg" id="msg"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "ptexpertshub-b785e.firebaseapp.com",
+  projectId: "ptexpertshub-b785e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let signup=false;
+
+onAuthStateChanged(auth,user=>{
+  if(user) location.href="masterclass_index.html";
+});
+
+window.toggleMode=()=>{
+  signup=!signup;
+  document.getElementById("title").innerText=signup?"Create Account":"Login";
+  document.getElementById("name").style.display=signup?"block":"none";
+};
+
+window.submitForm=async()=>{
+  const email=email.value;
+  const password=password.value;
+  const name=document.getElementById("name").value;
+  const msg=document.getElementById("msg");
+  try{
+    if(signup){
+      const cred=await createUserWithEmailAndPassword(auth,email,password);
+      await setDoc(doc(db,"users",cred.user.uid),{
+        name,email,paid:false,createdAt:serverTimestamp()
+      });
+    }else{
+      await signInWithEmailAndPassword(auth,email,password);
+    }
+  }catch(e){ msg.innerText=e.message }
+};
+</script>
+</body>
+</html>

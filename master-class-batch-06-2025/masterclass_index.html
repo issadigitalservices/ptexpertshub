@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PT Experts – Masterclass</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "ptexpertshub-b785e.firebaseapp.com",
+  projectId: "ptexpertshub-b785e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth,user=>{
+  if(!user) location.href="masterclass_login.html";
+});
+
+window.logout=()=>{
+  signOut(auth).then(()=>location.href="masterclass_login.html");
+};
+</script>
+
+<style>
+body{font-family:system-ui;background:#f4f7fb;margin:0}
+.wrap{max-width:900px;margin:2rem auto;padding:1rem}
+button{padding:.6rem 1rem;background:#facc15;border:none;font-weight:700}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <h2>Welcome to Masterclass</h2>
+  <p>Week-wise content will unlock here.</p>
+
+  <button onclick="logout()">Logout</button>
+</div>
+</body>
+</html>
