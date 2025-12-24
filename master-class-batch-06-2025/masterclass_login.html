@@ -5,6 +5,12 @@
 <title>Login – PT Experts Masterclass</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- LOAD FIREBASE FIRST -->
+<script type="module" src="firebase-config.js"></script>
+
+<!-- LOAD AUTH LOGIC -->
+<script type="module" src="auth.js"></script>
+
 <style>
 body{
   margin:0;
@@ -52,111 +58,6 @@ button{
   <div class="toggle" onclick="toggleMode()">New user? Create account</div>
   <div class="msg" id="msg"></div>
 </div>
-
-<script type="module">
-/* ---------------- FIREBASE IMPORTS ---------------- */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-/* ---------------- FIREBASE CONFIG ---------------- */
-const firebaseConfig = {
-  apiKey: "AIzaSyBzxaMy53uTRYTc10I777TQwnJekWyujUg",
-  authDomain: "ptexpertshub-b785e.firebaseapp.com",
-  projectId: "ptexpertshub-b785e"
-};
-
-/* ---------------- INIT ---------------- */
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* ---------------- STATE ---------------- */
-let signup = false;
-
-/* ---------------- TOGGLE LOGIN / SIGNUP ---------------- */
-window.toggleMode = () => {
-  signup = !signup;
-  document.getElementById("title").innerText = signup ? "Create Account" : "Login";
-  document.getElementById("name").style.display = signup ? "block" : "none";
-  document.querySelector(".toggle").innerText =
-    signup ? "Already have an account? Login" : "New user? Create account";
-  document.getElementById("msg").innerText = "";
-};
-
-/* ---------------- SUBMIT ---------------- */
-window.submitForm = async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const name = document.getElementById("name").value.trim();
-  const msg = document.getElementById("msg");
-
-  msg.innerText = "";
-
-  if (!email || !password) {
-    msg.innerText = "Email and password are required";
-    return;
-  }
-
-  try {
-    if (signup) {
-      if (!name) {
-        msg.innerText = "Please enter full name";
-        return;
-      }
-
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-      await setDoc(doc(db, "users", cred.user.uid), {
-        name: name,
-        email: email,
-        paid: false,
-        createdAt: serverTimestamp()
-      });
-
-      msg.style.color = "green";
-      msg.innerText = "Account created. Wait for admin approval.";
-
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-    }
-  } catch (e) {
-    msg.style.color = "#dc2626";
-    msg.innerText = e.message;
-  }
-};
-
-/* ---------------- AUTH STATE ---------------- */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
-
-  try {
-    const snap = await getDoc(doc(db, "users", user.uid));
-    if (!snap.exists()) return;
-
-    if (snap.data().paid === true) {
-      window.location.href = "masterclass_index.html";
-    } else {
-      document.getElementById("msg").innerText =
-        "Access not approved yet. Please contact admin.";
-    }
-  } catch (e) {
-    console.error(e);
-  }
-});
-</script>
 
 </body>
 </html>
