@@ -58,9 +58,22 @@
 
     /* ===== Course image / content ===== */
     .course-media{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.2rem 0 2rem;gap:1rem}
-    .course-media .frame{max-width:820px;border-radius:12px;overflow:hidden}
+    .course-media .frame{
+  width:100%;
+  max-width:1100px;   /* bigger on desktop */
+  margin:0 auto;
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.course-media video{
+  width:100%;
+  height:auto;
+  min-height:220px;
+  background:#000;
+}
+
     .course-media img{width:100%;height:auto;display:block}
-    .course-media video{width:100%;height:auto;display:block;border-radius:12px;outline:0;border:0}
 
     .course-info{max-width:880px;margin:0 auto;padding:1rem 1.25rem 3rem;color:#334155}
     .course-info p{margin:0 0 1rem;font-size:1.05rem}
@@ -160,6 +173,12 @@
     text-align:center;
   }
 }
+.course-media video{
+  width:100%;
+  height:auto;
+  background:#000;   /* ensures black screen */
+  display:block;
+}
   </style>
 </head>
 <body>
@@ -205,11 +224,17 @@
                Replace the "assets/m2.mp4" path with your actual video file path if needed.
                I used the poster above (uploaded image) so the video has a preview before play. -->
           <div class="frame" style="background:#000">
-            <video controls preload="metadata" poster="/mnt/data/fb7b0495-53e0-4036-9313-b6de6314ed7c.png">
-              <source src="assets/m2.mp4" type="video/mp4">
-              <!-- Fallback content -->
-              Your browser does not support HTML5 video. You can <a href="assets/m2.mp4">download the video here</a>.
-            </video>
+           <video
+  controls
+  playsinline
+  webkit-playsinline
+  preload="metadata"
+>
+  <source src="assets/m2.mp4" type="video/mp4">
+  Your browser does not support HTML5 video.
+</video>
+
+
           </div>
         </div>
 
