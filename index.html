@@ -179,6 +179,30 @@ footer{background:var(--navy);color:#d9e6ff}
 
   .cta-row{flex-direction:column;text-align:center}
 }
+
+/* Hide extra page title bar on mobile */
+@media (max-width: 768px){
+  .page-title,
+  .page-header,
+  .breadcrumb,
+  .section-title,
+  .top-bar{
+    display:none !important;
+  }
+}
+
+@media (max-width: 768px){
+  .nav-actions{
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+
+  .nav-actions .join{
+    font-size:.65rem;
+    padding:.4rem .55rem;
+  }
+}
+
 </style>
 
 </head>
@@ -214,7 +238,7 @@ footer{background:var(--navy);color:#d9e6ff}
       <h1>Sustainable<br/>Structural Solutions</h1>
       <p>Innovative structural design solutions for post-tensioned slab systems.</p>
       <div class="cta">
-        <a class="btn primary" href="projects.html">PROJECTSss</a>
+        <a class="btn primary" href="projects.html">PROJECTS</a>
         <a class="btn outline" href="services.html">SERVICES</a>
       </div>
     </div>
