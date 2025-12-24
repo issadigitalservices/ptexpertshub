@@ -162,15 +162,16 @@
     /* accessibility focus outlines */
     a:focus{outline:3px solid rgba(247,198,36,.35);outline-offset:2px}
 
-    /* ===== MOBILE RESPONSIVE NAV (FIXED) ===== */
+    /* ================================================= */
+/* =============== MOBILE RESPONSIVE (FINAL) ======= */
+/* ================================================= */
 @media (max-width: 768px){
 
-  /* Correct body offset for fixed header */
+  /* Fixed header spacing */
   body{
-    padding-top:72px;   /* FIX: matches real header height */
+    padding-top:72px;
   }
 
-  /* Fixed header height */
   header{
     height:72px;
   }
@@ -179,10 +180,10 @@
     min-height:72px;
   }
 
-  /* Dropdown nav */
+  /* Mobile dropdown navigation */
   nav{
     position:fixed;
-    top:72px;           /* FIX */
+    top:72px;
     left:0;
     right:0;
     background:rgba(10,26,50,.98);
@@ -191,10 +192,14 @@
     z-index:998;
   }
 
+  nav.open{
+    transform:translateY(0);
+  }
+
   nav ul{
     flex-direction:column;
     gap:0;
-    padding:0.5rem 1rem;
+    padding:.5rem 1rem;
   }
 
   nav li{
@@ -207,108 +212,53 @@
     font-size:1.15rem;
   }
 
-  nav.open{
-    transform:translateY(0);
-  }
-
-  /* Burger icon */
   .burger{
     display:block;
     font-size:1.8rem;
-    color:#fff;
-    background:none;
-    border:none;
     cursor:pointer;
   }
 
-  /* Client wants BOTH buttons */
   .nav-actions{
     gap:.35rem;
     align-items:center;
   }
 
-  .nav-actions a.join{
-    padding:.45rem .6rem;
+  .nav-actions .join{
     font-size:.72rem;
+    padding:.45rem .6rem;
     line-height:1.1;
     white-space:nowrap;
   }
 
-  /* FIX: Remove excessive overlap on mobile */
-  .features-wrap{
-    transform:translateY(-40px);  /* was -90px */
-    margin-bottom:-20px;
-  }
-}
-
-/* ===== CLEAN MOBILE FIX (FINAL) ===== */
-@media (max-width: 768px){
-
-  header{
-    height:72px;
-  }
-
-  body{
-    padding-top:72px;
-  }
-
-  /* STOP overlap on mobile */
+  /* Disable feature overlap ONLY on mobile */
   .features-wrap{
     transform:none;
-    margin-top:1.5rem;
-    margin-bottom:1.5rem;
+    margin:1.5rem 0;
   }
 
-  /* Hero spacing correction */
+  /* Stack all grids */
+  .features,
+  .intro-grid,
+  .stats,
+  .services,
+  .projects,
+  .why-grid,
+  .footer-grid{
+    grid-template-columns:1fr;
+  }
+
+  /* Hero spacing */
   .hero-inner{
     padding-top:3.5rem;
     padding-bottom:4rem;
   }
-}
 
-/* ===== ABSOLUTE MOBILE FIX (NO CLASS DEPENDENCY) ===== */
-@media (max-width: 768px){
-
-  /* Correct spacing for fixed header */
-  body{
-    padding-top:72px;
-  }
-
-  /* Push FIRST section below header */
-  header + *{
-    margin-top:72px;
-  }
-
-  /* Disable overlap tricks on mobile */
-  [class*="features"]{
-    transform:none !important;
-    margin-top:1.5rem !important;
-    margin-bottom:1.5rem !important;
-  }
-
-}
-/* ===== MOBILE: PUSH FEATURES BELOW SEND YOUR ENQUIRY ===== */
-@media (max-width: 768px){
-
-  /* Force feature section to start lower */
-  .features,
-  .features-wrap{
-    margin-top:120px !important;
-    transform:none !important;
-  }
-
-}
-
+  /* Buttons full width only where needed */
   .join{
-    width:100%;
-    text-align:center;
+    width:auto;
   }
-
-.section-footer{
-  display:flex;
-  justify-content:center;
-  margin-top:1.5rem;
 }
+
 
   </style>
 </head>
@@ -344,7 +294,7 @@
       <h1>Sustainable<br/>Structural Solutions</h1>
       <p>Innovative structural design solutions for post-tensioned slab systems.</p>
       <div class="cta">
-        <a class="btn primary" href="projects.html">PROJECTSs</a>
+        <a class="btn primary" href="projects.html">PROJECTS</a>
         <a class="btn outline" href="services.html">SERVICES</a>
       </div>
     </div>
