@@ -79,11 +79,12 @@ window.toggleMode=()=>{
   document.getElementById("name").style.display=signup?"block":"none";
 };
 
-window.submitForm=async()=>{
-  const email=email.value;
-  const password=password.value;
-  const name=document.getElementById("name").value;
-  const msg=document.getElementById("msg");
+window.submitForm = async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const msg = document.getElementById("msg");
+
   try{
     if(signup){
       const cred=await createUserWithEmailAndPassword(auth,email,password);
