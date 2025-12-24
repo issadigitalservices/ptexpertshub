@@ -66,7 +66,19 @@ window.submitForm = async () => {
       });
 
       msg.style.color = "green";
-      msg.innerText = "Account created. Wait for admin approval.";
+msg.innerText =
+  "Your account has been created successfully. You will be notified once access is approved.";
+
+const phone = "919746431460"; // admin WhatsApp number (no +)
+const text = encodeURIComponent(
+  `Hello Admin, I have created an account for PT Experts Masterclass.\n\nEmail: ${email}\n\nPlease approve my access.`
+);
+
+document.getElementById("waLink").href =
+  `https://wa.me/${phone}?text=${text}`;
+
+document.getElementById("whatsappBox").style.display = "block";
+
 
     } else {
       await signInWithEmailAndPassword(auth, email, password);
@@ -87,7 +99,11 @@ onAuthStateChanged(auth, async (user) => {
   if (snap.data().paid === true) {
     window.location.href = "masterclass_index.html";
   } else {
-    document.getElementById("msg").innerText =
-      "Access not approved yet. Please contact admin.";
-  }
+  const msg = document.getElementById("msg");
+  msg.style.color = "#dc2626";
+  msg.innerText =
+    "Your account is pending approval. Please contact admin on WhatsApp for faster access.";
+
+document.getElementById("whatsappBox").style.display = "block";
+}
 });
