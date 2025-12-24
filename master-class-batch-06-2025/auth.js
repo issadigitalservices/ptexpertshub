@@ -19,7 +19,7 @@ const db = window.db;
 // STATE
 let signup = false;
 
-// TOGGLE LOGIN / SIGNUP
+/* ---------------- TOGGLE LOGIN / SIGNUP ---------------- */
 window.toggleMode = () => {
   signup = !signup;
 
@@ -33,15 +33,17 @@ window.toggleMode = () => {
     signup ? "Already have an account? Login" : "New user? Create account";
 
   document.getElementById("msg").innerText = "";
+  hideExtras();
 };
 
-// SUBMIT FORM  ✅ (THIS WAS MISSING)
+/* ---------------- SUBMIT FORM ---------------- */
 window.submitForm = async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const name = document.getElementById("name").value.trim();
   const msg = document.getElementById("msg");
 
+  msg.style.color = "#dc2626";
   msg.innerText = "";
 
   if (!email || !password) {
@@ -50,6 +52,7 @@ window.submitForm = async () => {
   }
 
   try {
+    // -------- SIGNUP --------
     if (signup) {
       if (!name) {
         msg.innerText = "Please enter full name";
@@ -65,45 +68,80 @@ window.submitForm = async () => {
         createdAt: serverTimestamp()
       });
 
+      // SUCCESS MESSAGE
       msg.style.color = "green";
-msg.innerText =
-  "Your account has been created successfully. You will be notified once access is approved.";
+      msg.innerText =
+        "Your account has been created successfully. You will be notified once access is approved.";
 
-const phone = "919746431460"; // admin WhatsApp number (no +)
-const text = encodeURIComponent(
-  `Hello Admin, I have created an account for PT Experts Masterclass.\n\nEmail: ${email}\n\nPlease approve my access.`
-);
+      showPendingUI(email);
 
-document.getElementById("waLink").href =
-  `https://wa.me/${phone}?text=${text}`;
+      // 🔁 AUTO SWITCH TO LOGIN MODE
+      setTimeout(() => {
+        signup = false;
+        document.getElementById("title").innerText = "Login";
+        document.getElementById("name").style.display = "none";
+        document.querySelector(".toggle").innerText = "New user? Create account";
+      }, 2000);
 
-document.getElementById("whatsappBox").style.display = "block";
-
-
+    // -------- LOGIN --------
     } else {
       await signInWithEmailAndPassword(auth, email, password);
     }
+
   } catch (e) {
     msg.style.color = "#dc2626";
     msg.innerText = e.message;
   }
 };
 
-// AUTH STATE (LOGIN PAGE ONLY)
+/* ---------------- AUTH STATE (LOGIN PAGE ONLY) ---------------- */
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
   const snap = await getDoc(doc(db, "users", user.uid));
   if (!snap.exists()) return;
 
+  // ✅ APPROVED
   if (snap.data().paid === true) {
+    hideExtras();
     window.location.href = "masterclass_index.html";
-  } else {
+    return;
+  }
+
+  // ⏳ NOT APPROVED
   const msg = document.getElementById("msg");
   msg.style.color = "#dc2626";
-  msg.innerText =
-    "Your account is pending approval. Please contact admin on WhatsApp for faster access.";
+  msg.innerText = "Your account is pending approval.";
 
-document.getElementById("whatsappBox").style.display = "block";
-}
+  showPendingUI(user.email);
 });
+
+/* ---------------- HELPERS ---------------- */
+
+function showPendingUI(email) {
+  // Badge
+  const badge = document.getElementById("statusBadge");
+  if (badge) badge.style.display = "block";
+
+  // WhatsApp
+  const waBox = document.getElementById("whatsappBox");
+  const waLink = document.getElementById("waLink");
+
+  if (waBox && waLink) {
+    const phone = "971528553400"; // admin number (no +)
+    const text = encodeURIComponent(
+      `Hello Admin,\n\nI have created an account for PT Experts Masterclass.\n\nEmail: ${email}\n\nPlease approve my access.`
+    );
+
+    waLink.href = `https://wa.me/${phone}?text=${text}`;
+    waBox.style.display = "block";
+  }
+}
+
+function hideExtras() {
+  const badge = document.getElementById("statusBadge");
+  const waBox = document.getElementById("whatsappBox");
+
+  if (badge) badge.style.display = "none";
+  if (waBox) waBox.style.display = "none";
+}
