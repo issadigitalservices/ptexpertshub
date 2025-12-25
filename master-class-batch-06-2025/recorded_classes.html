@@ -8,104 +8,77 @@
 <script type="module" src="firebase-config.js"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:#f4f7fb;
-}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;background:#f4f7fb}
 
 /* HEADER */
 header{
-  background:#0a1a32;
-  color:#fff;
+  background:#0a1a32;color:#fff;
   padding:1rem 1.5rem;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display:flex;justify-content:space-between;align-items:center
 }
-header a{
-  color:#22c55e;
-  font-weight:600;
-  text-decoration:none;
-}
+header a{color:#22c55e;font-weight:600;text-decoration:none}
 
 /* LAYOUT */
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:1.5rem;
+.container{max-width:1000px;margin:auto;padding:1.5rem}
+
+/* PROGRESS */
+.progress{
+  background:#fff;padding:1rem 1.2rem;border-radius:12px;
+  margin-bottom:18px;box-shadow:0 6px 18px rgba(0,0,0,.08)
 }
 
 /* LIST */
-.list{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+.list{display:flex;flex-direction:column;gap:14px}
 .item{
-  background:#fff;
-  padding:1rem 1.2rem;
-  border-radius:12px;
+  background:#fff;padding:1rem 1.2rem;border-radius:12px;
   box-shadow:0 6px 18px rgba(0,0,0,.08);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display:flex;justify-content:space-between;align-items:center
 }
-.item.disabled{opacity:.4}
-.item.locked{opacity:.6}
+.item.locked{opacity:.5}
 
 /* BADGES */
-.badge{
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:.75rem;
-  font-weight:600;
-}
-.badge.open{background:#dcfce7;color:#166534}
+.badge{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge.completed{background:#dcfce7;color:#166534}
+.badge.available{background:#e0f2fe;color:#075985}
 .badge.locked{background:#fde68a;color:#92400e}
-.badge.disabled{background:#e5e7eb;color:#374151}
 
-/* PLAY */
+/* BUTTON */
 .play{
   padding:6px 16px;
   border-radius:8px;
   border:none;
-  cursor:pointer;
   font-weight:700;
+  cursor:pointer;
 }
-.play.open{background:#22c55e;color:#fff}
-.play.locked{background:#facc15}
-.play.disabled{background:#e5e7eb}
+.play:hover{
+  opacity:.9;
+}
+
+.play.play{background:#22c55e;color:#fff}
+.play.rewatch{background:#2563eb;color:#fff}
+.play.locked{background:#e5e7eb}
 
 /* PLAYER */
 #playerBox{
-  margin-top:30px;
+  margin-top:30px;background:#fff;padding:1rem;
+  border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.08)
 }
-iframe{
-  width:100%;
-  height:420px;
-  border:none;
-  border-radius:12px;
-}
+iframe{width:100%;height:420px;border:none;border-radius:12px}
 
-/* CHECK */
-.check{
-  color:#22c55e;
-  font-size:1.1rem;
-  margin-left:8px;
+.finishBtn{
+  margin-top:12px;padding:.7rem 1.2rem;
+  background:#16a34a;color:#fff;border:none;
+  border-radius:10px;font-weight:700;cursor:pointer
 }
 
 .loading{
-  min-height:60vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#64748b;
+  min-height:60vh;display:flex;
+  align-items:center;justify-content:center;color:#64748b
 }
 </style>
 </head>
 
-<body oncontextmenu="return false">
+<body>
 
 <header>
   <a href="masterclass_index.html">← Back</a>
@@ -114,59 +87,50 @@ iframe{
 
 <div class="container">
 
+  <div id="progress" class="progress"></div>
+
   <div id="loading" class="loading">Loading classes…</div>
   <div id="list" class="list"></div>
 
   <!-- PLAYER -->
   <div id="playerBox" style="display:none">
     <h3 id="videoTitle"></h3>
-    <iframe
-      id="player"
-      loading="lazy"
-      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen>
-    </iframe>
+    <iframe id="player" allowfullscreen></iframe>
+    <button id="finishBtn" class="finishBtn">
+      ✅ Finished Watching
+    </button>
   </div>
 
 </div>
 
 <script type="module">
-import { onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
+import { onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  collection,getDocs,doc,getDoc,updateDoc,query,orderBy
+} from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const auth = window.auth;
-const db = window.db;
+const auth=window.auth, db=window.db;
+const COURSE_ID="masterclass_batch_06_2025";
 
-/* 🔑 SAME COURSE ID AS ADMIN */
-const COURSE_ID = "masterclass_batch_06_2025";
+let currentUserId=null;
+let currentVideoId=null;
 
-const list = document.getElementById("list");
-const loading = document.getElementById("loading");
+const list=document.getElementById("list");
+const loading=document.getElementById("loading");
+const progress=document.getElementById("progress");
+const finishBtn=document.getElementById("finishBtn");
 
-let currentUserId = null;
-let lastWatched = null;
-
-/* AUTH CHECK */
-onAuthStateChanged(auth, async (user)=>{
+/* AUTH */
+onAuthStateChanged(auth, async user=>{
   if(!user) return location.href="masterclass_login.html";
-  currentUserId = user.uid;
+  currentUserId=user.uid;
 
-  const userSnap = await getDoc(doc(db,"users",user.uid));
-  if(!userSnap.exists() || userSnap.data().paid !== true){
+  const u=await getDoc(doc(db,"users",user.uid));
+  if(!u.exists()||u.data().paid!==true)
     return location.href="masterclass_login.html";
-  }
 
-  lastWatched = userSnap.data().lastWatched || null;
   loadVideos();
 });
 
@@ -175,93 +139,97 @@ async function loadVideos(){
   list.innerHTML="";
   loading.style.display="flex";
 
-  const q = query(
+  const q=query(
     collection(db,"courses",COURSE_ID,"recorded_classes"),
     orderBy("order","asc")
   );
+  const snap=await getDocs(q);
 
-  const snap = await getDocs(q);
-  let firstPlayable = null;
+  let allowNext=true, completedCount=0;
 
   snap.forEach(d=>{
-    const v = d.data();
-    const vid = d.id;
+    const v=d.data();
+    const done=v.completedBy?.includes(currentUserId);
+    if(done) completedCount++;
 
-    let state="open", badge="Available";
-    if(!v.enabled){ state="disabled"; badge="Disabled"; }
-    else if(v.locked){ state="locked"; badge="Locked"; }
+    let state="locked";
+    if(done) state="completed";
+    else if(allowNext) state="available";
 
-    const completed = v.completedBy?.includes(currentUserId);
+    if(!done && allowNext) allowNext=false;
 
-    const row = document.createElement("div");
-    row.className=`item ${state}`;
+    const row=document.createElement("div");
+    row.className=`item ${state==="locked"?"locked":""}`;
     row.innerHTML=`
       <div>
-        <strong>${v.title}</strong>
-        ${completed ? `<span class="check">✔</span>` : ""}
-        <br>
-        <span class="badge ${state}">${badge}</span>
+        <strong>${v.title}</strong><br>
+        <span class="badge ${state}">
+          ${state==="completed"?"Completed":state==="available"?"Available":"Locked"}
+        </span>
       </div>
-      <button class="play ${state}">
-        ${state==="open"?"Play":"🔒"}
+      <button class="play ${state==="completed"?"rewatch":state==="available"?"play":"locked"}">
+        ${state==="completed"?"Rewatch":state==="available"?"Play":"🔒"}
       </button>
     `;
 
-    if(state==="open"){
+    if(state!=="locked"){
       row.querySelector("button").onclick=()=>{
-        playVideo(vid,v.title,v.videoUrl);
+        playVideo(d.id,v.title,v.videoUrl,done);
       };
-      if(!firstPlayable) firstPlayable = {id:vid, ...v};
     }
 
     list.appendChild(row);
   });
 
+  const percent = Math.round((completedCount / snap.size) * 100);
+
+progress.innerHTML = `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <strong>Progress</strong>
+    <span>${completedCount} / ${snap.size} (${percent}%)</span>
+  </div>
+
+  <div style="background:#e5e7eb;height:10px;border-radius:20px;overflow:hidden">
+    <div style="
+      width:${percent}%;
+      height:100%;
+      background:#22c55e;
+      transition:width .3s ease">
+    </div>
+  </div>
+`;
+
+
   loading.style.display="none";
-
-  // AUTO OPEN LAST WATCHED OR FIRST VIDEO
-  if(lastWatched){
-    const snap = await getDoc(
-      doc(db,"courses",COURSE_ID,"recorded_classes",lastWatched)
-    );
-    if(snap.exists()){
-      const v = snap.data();
-      playVideo(lastWatched,v.title,v.videoUrl);
-      return;
-    }
-  }
-
-  if(firstPlayable){
-    playVideo(firstPlayable.id,firstPlayable.title,firstPlayable.videoUrl);
-  }
 }
 
 /* PLAY VIDEO */
-async function playVideo(id,title,embedUrl){
-  document.getElementById("videoTitle").innerText = title;
-  document.getElementById("player").src = embedUrl;
+function playVideo(id,title,embedUrl,completed){
+  currentVideoId=id;
+  document.getElementById("videoTitle").innerText=title;
+  document.getElementById("player").src=embedUrl;
   document.getElementById("playerBox").style.display="block";
 
-  // SAVE LAST WATCHED
-  await updateDoc(doc(db,"users",currentUserId),{
-    lastWatched:id
-  });
-
-  // MARK COMPLETED
-  const ref = doc(db,"courses",COURSE_ID,"recorded_classes",id);
-  const snap = await getDoc(ref);
-  const done = snap.exists() && snap.data().completedBy
-    ? snap.data().completedBy
-    : [];
-
-  if(!done.includes(currentUserId)){
-    await updateDoc(ref,{
-      completedBy:[...done,currentUserId]
-    });
-  }
+  finishBtn.style.display=completed?"none":"inline-block";
 
   window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
+
+/* FINISHED WATCHING */
+finishBtn.onclick=async()=>{
+  if(!currentVideoId) return;
+
+  const ref=doc(db,"courses",COURSE_ID,"recorded_classes",currentVideoId);
+  const snap=await getDoc(ref);
+  const done=snap.data().completedBy||[];
+
+  if(!done.includes(currentUserId)){
+    await updateDoc(ref,{completedBy:[...done,currentUserId]});
+  }
+
+  finishBtn.style.display="none";
+  loadVideos();
+};
 </script>
 
 </body>
