@@ -5,7 +5,6 @@
 <title>Recorded Classes – Admin | PT Experts Masterclass</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase shared init -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -14,8 +13,6 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:#f4f7fb;
 }
-
-/* HEADER */
 header{
   background:#0a1a32;
   color:#fff;
@@ -24,25 +21,10 @@ header{
   justify-content:space-between;
   align-items:center;
 }
-header a{
-  color:#22c55e;
-  text-decoration:none;
-  font-weight:600;
-}
-.logout{
-  cursor:pointer;
-  color:#facc15;
-  font-weight:600;
-}
+header a{color:#22c55e;text-decoration:none;font-weight:600}
+.logout{cursor:pointer;color:#facc15;font-weight:600}
+.container{max-width:1200px;margin:auto;padding:2rem 1.5rem}
 
-/* LAYOUT */
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:2rem 1.5rem;
-}
-
-/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
@@ -55,19 +37,13 @@ th,td{
   padding:.8rem;
   border-bottom:1px solid #e2e8f0;
 }
-th{
-  background:#f1f5f9;
-  font-weight:700;
-}
+th{background:#f1f5f9;font-weight:700}
 
-/* INPUTS */
-input[type="text"],
-input[type="number"]{
+input[type="text"],input[type="number"]{
   width:100%;
-  padding:.4rem;
+  padding:.45rem;
 }
 
-/* BUTTONS */
 button{
   padding:.45rem .9rem;
   border:none;
@@ -79,7 +55,6 @@ button{
 .delete{background:#ef4444;color:#fff}
 .add{background:#16a34a;color:#fff;margin-top:15px}
 
-/* LOADING */
 .loading{
   min-height:100vh;
   display:flex;
@@ -107,21 +82,21 @@ button{
 
 <div class="container">
 
-  <table>
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Video URL</th>
-        <th>Order</th>
-        <th>Enabled</th>
-        <th>Locked</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="videoRows"></tbody>
-  </table>
+<table>
+<thead>
+<tr>
+  <th>Title</th>
+  <th>YouTube Video URL</th>
+  <th>Order</th>
+  <th>Enabled</th>
+  <th>Locked</th>
+  <th>Action</th>
+</tr>
+</thead>
+<tbody id="videoRows"></tbody>
+</table>
 
-  <button class="add" onclick="addNewWeek()">➕ Add New Week</button>
+<button class="add" onclick="addNew()">➕ Add New Video</button>
 
 </div>
 </div>
@@ -129,27 +104,20 @@ button{
 <script type="module">
 import { onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy
+  collection, getDocs, doc, getDoc,
+  setDoc, updateDoc, deleteDoc,
+  query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const auth = window.auth;
 const db = window.db;
 
+/* 🔑 KEEP SAME COURSE ID EVERYWHERE */
+const COURSE_ID = "masterclass_batch_06_2025";
+
 const courseRef = collection(
-  db,
-  "courses",
-  "masterclass_06_2025",
-  "recorded_classes"
+  db,"courses",COURSE_ID,"recorded_classes"
 );
 
 /* ---------- AUTH CHECK ---------- */
@@ -159,28 +127,53 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
-  const adminSnap = await getDoc(doc(db, "admins", user.uid));
+  const adminSnap = await getDoc(doc(db,"admins",user.uid));
   if (!adminSnap.exists()) {
     alert("Admin access only");
     location.href = "masterclass_index.html";
     return;
   }
 
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("panel").style.display = "block";
+  document.getElementById("loading").style.display="none";
+  document.getElementById("panel").style.display="block";
   loadVideos();
 });
 
-/* ---------- LOAD VIDEOS ---------- */
+/* ---------- YOUTUBE VIDEO PARSER (NO PLAYLIST) ---------- */
+function parseVideo(raw){
+  try{
+    if(raw.includes("list=")) return null;
+
+    const u = new URL(raw);
+    const v = u.searchParams.get("v");
+
+    if(v){
+      return {
+        embed:`https://www.youtube.com/embed/${v}`,
+        view:`https://www.youtube.com/watch?v=${v}`
+      };
+    }
+
+    if(u.hostname.includes("youtu.be")){
+      const id = u.pathname.replace("/","");
+      return {
+        embed:`https://www.youtube.com/embed/${id}`,
+        view:`https://www.youtube.com/watch?v=${id}`
+      };
+    }
+  }catch(e){}
+  return null;
+}
+
+/* ---------- LOAD ---------- */
 async function loadVideos(){
   const rows = document.getElementById("videoRows");
-  rows.innerHTML = "";
+  rows.innerHTML="";
 
-  const q = query(courseRef, orderBy("order","asc"));
-  const snap = await getDocs(q);
+  const snap = await getDocs(query(courseRef,orderBy("order","asc")));
 
-  if (snap.empty) {
-    rows.innerHTML = `
+  if(snap.empty){
+    rows.innerHTML=`
       <tr>
         <td colspan="6" style="text-align:center;color:#64748b">
           No recorded classes added yet.
@@ -190,60 +183,71 @@ async function loadVideos(){
   }
 
   snap.forEach(d=>{
-    const v = d.data();
-    rows.innerHTML += `
+    const v=d.data();
+    rows.innerHTML+=`
       <tr>
-        <td><input id="t_${d.id}" value="${v.title || ""}"></td>
-        <td><input id="u_${d.id}" value="${v.videoUrl || ""}"></td>
-        <td><input type="number" id="o_${d.id}" value="${v.order || 1}" style="width:70px"></td>
-        <td><input type="checkbox" id="e_${d.id}" ${v.enabled ? "checked" : ""}></td>
-        <td><input type="checkbox" id="l_${d.id}" ${v.locked ? "checked" : ""}></td>
+        <td><input id="t_${d.id}" value="${v.title||""}"></td>
+        <td><input id="u_${d.id}" value="${v.viewUrl||""}"></td>
+        <td><input type="number" id="o_${d.id}" value="${v.order||1}" style="width:70px"></td>
+        <td><input type="checkbox" id="e_${d.id}" ${v.enabled?"checked":""}></td>
+        <td><input type="checkbox" id="l_${d.id}" ${v.locked?"checked":""}></td>
         <td style="display:flex;gap:8px">
-          <button class="save" onclick="saveVideo('${d.id}')">💾</button>
-          <button class="delete" onclick="deleteVideo('${d.id}')">🗑</button>
+          <button class="save" onclick="save('${d.id}')">💾</button>
+          <button class="delete" onclick="del('${d.id}')">🗑</button>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
 }
 
 /* ---------- SAVE ---------- */
-window.saveVideo = async id => {
+window.save = async id =>{
+  const raw = document.getElementById(`u_${id}`).value.trim();
+  const parsed = parseVideo(raw);
+
+  if(!parsed){
+    alert("Only single YouTube video links allowed (no playlist)");
+    return;
+  }
+
   await updateDoc(doc(courseRef,id),{
     title: document.getElementById(`t_${id}`).value,
-    videoUrl: document.getElementById(`u_${id}`).value,
+    videoUrl: parsed.embed,
+    viewUrl: parsed.view,
     order: Number(document.getElementById(`o_${id}`).value),
     enabled: document.getElementById(`e_${id}`).checked,
     locked: document.getElementById(`l_${id}`).checked
   });
+
   alert("Saved successfully");
   loadVideos();
 };
 
 /* ---------- DELETE ---------- */
-window.deleteVideo = async id => {
-  if (!confirm("Are you sure you want to delete this week?")) return;
-  await deleteDoc(doc(courseRef,id));
-  loadVideos();
+window.del = async id =>{
+  if(confirm("Delete this video?")){
+    await deleteDoc(doc(courseRef,id));
+    loadVideos();
+  }
 };
 
-/* ---------- ADD NEW WEEK ---------- */
-window.addNewWeek = async () => {
-  await setDoc(doc(courseRef, "week_" + Date.now()), {
-    title: "New Week",
-    videoUrl: "",
-    order: 999,
-    enabled: false,
-    locked: true,
-    createdAt: new Date()
+/* ---------- ADD ---------- */
+window.addNew = async ()=>{
+  await setDoc(doc(courseRef,"vid_"+Date.now()),{
+    title:"New Video",
+    videoUrl:"",
+    viewUrl:"",
+    order:999,
+    enabled:false,
+    locked:true,
+    createdAt:new Date()
   });
   loadVideos();
 };
 
 /* ---------- LOGOUT ---------- */
-window.logout = async () => {
+window.logout = async ()=>{
   await signOut(auth);
-  location.href = "masterclass_login.html";
+  location.href="masterclass_login.html";
 };
 </script>
 

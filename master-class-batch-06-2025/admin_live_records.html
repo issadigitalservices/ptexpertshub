@@ -69,7 +69,7 @@ th{background:#f1f5f9;font-size:.9rem}
 <div class="form">
   <div class="form-grid">
     <input id="title" placeholder="Class Title">
-    <input id="videoUrl" placeholder="Paste YouTube video or playlist URL">
+    <input id="videoUrl" placeholder="Paste ONLY YouTube video URL">
     <input id="order" type="number" placeholder="Display Order">
     <select id="locked">
       <option value="true">Locked (Paid)</option>
@@ -122,45 +122,37 @@ onAuthStateChanged(auth,(u)=>{
   if(!u) location.href="masterclass_login.html";
 });
 
-/* ===== YOUTUBE URL PARSER (VIDEO + PLAYLIST SAFE) ===== */
-function parseYouTubeUrl(raw){
-  const u = new URL(raw);
-  const list = u.searchParams.get("list");
-  const v = u.searchParams.get("v");
+/* ===== ONLY YOUTUBE VIDEO PARSER (NO PLAYLIST) ===== */
+function parseYouTubeVideo(raw){
+  try{
+    const u = new URL(raw);
 
-  // Playlist page
-  if(u.pathname.includes("playlist") && list){
-    return {
-      embed:`https://www.youtube.com/embed/videoseries?list=${list}`,
-      view:`https://www.youtube.com/playlist?list=${list}`
-    };
-  }
+    // ❌ Block playlist
+    if(u.searchParams.get("list")){
+      alert("Playlist links are not allowed. Please paste a single YouTube video link.");
+      return null;
+    }
 
-  // Video inside playlist
-  if(list && v){
-    return {
-      embed:`https://www.youtube.com/embed/videoseries?list=${list}`,
-      view:`https://www.youtube.com/watch?v=${v}&list=${list}`
-    };
-  }
+    // Normal watch URL
+    const v = u.searchParams.get("v");
+    if(v){
+      return {
+        embed:`https://www.youtube.com/embed/${v}`,
+        view:`https://www.youtube.com/watch?v=${v}`
+      };
+    }
 
-  // Normal video
-  if(v){
-    return {
-      embed:`https://www.youtube.com/embed/${v}`,
-      view:`https://www.youtube.com/watch?v=${v}`
-    };
-  }
+    // Short youtu.be URL
+    if(u.hostname.includes("youtu.be")){
+      const id = u.pathname.replace("/","");
+      return {
+        embed:`https://www.youtube.com/embed/${id}`,
+        view:`https://www.youtube.com/watch?v=${id}`
+      };
+    }
+  }catch(e){}
 
-  // youtu.be short link
-  if(u.hostname.includes("youtu.be")){
-    const id = u.pathname.replace("/","");
-    return {
-      embed:`https://www.youtube.com/embed/${id}`,
-      view:`https://www.youtube.com/watch?v=${id}`
-    };
-  }
-
+  alert("Invalid YouTube video URL");
   return null;
 }
 
@@ -197,15 +189,14 @@ window.saveRecord = async ()=>{
   const order = Number(orderInput.value);
   const locked = lockedInput.value==="true";
 
-  const parsed = parseYouTubeUrl(raw);
-  if(!title || !parsed || !order){
-    alert("Please enter valid data");
-    return;
-  }
+  const parsed = parseYouTubeVideo(raw);
+  if(!title || !parsed || !order) return;
 
   if(editId){
-    await updateDoc(doc(db,"courses",COURSE_ID,"live_record_classes",editId),
-      {title,videoUrl:parsed.embed,viewUrl:parsed.view,order,locked});
+    await updateDoc(
+      doc(db,"courses",COURSE_ID,"live_record_classes",editId),
+      {title,videoUrl:parsed.embed,viewUrl:parsed.view,order,locked}
+    );
     editId=null;
     formTitle.textContent="Add Live Record Class";
   }else{
@@ -239,8 +230,10 @@ window.editRec = (id,t,url,o,l)=>{
 };
 
 window.toggleLock = async(id,current)=>{
-  await updateDoc(doc(db,"courses",COURSE_ID,"live_record_classes",id),
-    {locked:!current});
+  await updateDoc(
+    doc(db,"courses",COURSE_ID,"live_record_classes",id),
+    {locked:!current}
+  );
   loadData();
 };
 

@@ -5,7 +5,6 @@
 <title>Recorded Classes – PT Experts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase init -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -121,9 +120,10 @@ iframe{
   <!-- PLAYER -->
   <div id="playerBox" style="display:none">
     <h3 id="videoTitle"></h3>
-    <iframe id="player"
-      sandbox="allow-scripts allow-same-origin allow-presentation"
-      allow="encrypted-media; picture-in-picture"
+    <iframe
+      id="player"
+      loading="lazy"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen>
     </iframe>
   </div>
@@ -139,7 +139,6 @@ import {
   getDocs,
   doc,
   getDoc,
-  setDoc,
   updateDoc,
   query,
   orderBy
@@ -147,6 +146,9 @@ import {
 
 const auth = window.auth;
 const db = window.db;
+
+/* 🔑 SAME COURSE ID AS ADMIN */
+const COURSE_ID = "masterclass_batch_06_2025";
 
 const list = document.getElementById("list");
 const loading = document.getElementById("loading");
@@ -174,12 +176,11 @@ async function loadVideos(){
   loading.style.display="flex";
 
   const q = query(
-    collection(db,"courses","masterclass_06_2025","recorded_classes"),
+    collection(db,"courses",COURSE_ID,"recorded_classes"),
     orderBy("order","asc")
   );
 
   const snap = await getDocs(q);
-
   let firstPlayable = null;
 
   snap.forEach(d=>{
@@ -207,7 +208,9 @@ async function loadVideos(){
     `;
 
     if(state==="open"){
-      row.querySelector("button").onclick=()=>playVideo(vid,v.title,v.videoUrl);
+      row.querySelector("button").onclick=()=>{
+        playVideo(vid,v.title,v.videoUrl);
+      };
       if(!firstPlayable) firstPlayable = {id:vid, ...v};
     }
 
@@ -218,9 +221,11 @@ async function loadVideos(){
 
   // AUTO OPEN LAST WATCHED OR FIRST VIDEO
   if(lastWatched){
-    const docSnap = await getDoc(doc(db,"courses","masterclass_06_2025","recorded_classes",lastWatched));
-    if(docSnap.exists()){
-      const v = docSnap.data();
+    const snap = await getDoc(
+      doc(db,"courses",COURSE_ID,"recorded_classes",lastWatched)
+    );
+    if(snap.exists()){
+      const v = snap.data();
       playVideo(lastWatched,v.title,v.videoUrl);
       return;
     }
@@ -232,41 +237,30 @@ async function loadVideos(){
 }
 
 /* PLAY VIDEO */
-async function playVideo(id,title,url){
+async function playVideo(id,title,embedUrl){
   document.getElementById("videoTitle").innerText = title;
-
-  let embedUrl = url;
-
-  if(url.includes("youtube.com/watch")){
-    const v = new URL(url).searchParams.get("v");
-    embedUrl = `https://www.youtube.com/embed/${v}`;
-  }
-
-  if(url.includes("youtube.com/playlist")){
-    const listId = new URL(url).searchParams.get("list");
-    embedUrl = `https://www.youtube.com/embed/videoseries?list=${listId}`;
-  }
-
   document.getElementById("player").src = embedUrl;
   document.getElementById("playerBox").style.display="block";
 
-  // SAVE LAST WATCHED + COMPLETION
+  // SAVE LAST WATCHED
   await updateDoc(doc(db,"users",currentUserId),{
     lastWatched:id
   });
 
-  await updateDoc(
-    doc(db,"courses","masterclass_06_2025","recorded_classes",id),
-    { completedBy: Array.from(new Set([...(await getCompleted(id)), currentUserId])) }
-  );
+  // MARK COMPLETED
+  const ref = doc(db,"courses",COURSE_ID,"recorded_classes",id);
+  const snap = await getDoc(ref);
+  const done = snap.exists() && snap.data().completedBy
+    ? snap.data().completedBy
+    : [];
+
+  if(!done.includes(currentUserId)){
+    await updateDoc(ref,{
+      completedBy:[...done,currentUserId]
+    });
+  }
 
   window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
-}
-
-/* GET COMPLETION LIST */
-async function getCompleted(id){
-  const snap = await getDoc(doc(db,"courses","masterclass_06_2025","recorded_classes",id));
-  return snap.exists() && snap.data().completedBy ? snap.data().completedBy : [];
 }
 </script>
 
