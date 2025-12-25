@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PT Experts – Masterclass Dashboard</title>
+<title>PT Experts – Masterclass</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- 🔥 Firebase init (ONLY ONCE) -->
+<!-- Firebase init -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -14,6 +14,8 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:#f4f7fb;
 }
+
+/* HEADER */
 header{
   background:#0a1a32;
   color:#fff;
@@ -22,29 +24,63 @@ header{
   justify-content:space-between;
   align-items:center;
 }
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:1.5rem;
+header a{
+  color:#22c55e;
+  font-weight:600;
+  text-decoration:none;
+  margin-right:15px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:1rem;
-}
-.card{
-  background:#fff;
-  padding:1.25rem;
-  border-radius:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-.card h3{margin-top:0}
 .logout{
   cursor:pointer;
   font-weight:600;
   color:#facc15;
 }
-.hidden{display:none}
+
+/* LAYOUT */
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:2rem 1.5rem;
+}
+
+h2{
+  margin-bottom:.5rem;
+}
+.subtitle{
+  color:#64748b;
+  margin-bottom:2rem;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1.2rem;
+}
+
+/* CARD */
+.card{
+  background:#fff;
+  padding:1.5rem;
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  cursor:pointer;
+  transition:.2s ease;
+}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 30px rgba(0,0,0,.12);
+}
+.card h3{
+  margin:0 0 .6rem;
+}
+.card p{
+  margin:0;
+  color:#475569;
+  font-size:.95rem;
+}
+
+/* LOADING */
 .loading{
   min-height:100vh;
   display:flex;
@@ -53,13 +89,7 @@ header{
   font-size:1.1rem;
   color:#64748b;
 }
-#adminBtn{
-  display:none;
-  margin-right:15px;
-  cursor:pointer;
-  color:#22c55e;
-  font-weight:600;
-}
+.hidden{display:none}
 </style>
 </head>
 
@@ -76,108 +106,81 @@ header{
 <header>
   <span>PT Experts – Masterclass</span>
   <div>
-    <span id="adminBtn" onclick="location.href='masterclass_admin.html'">
-      Admin Panel
-    </span>
+    <a id="adminBtn" href="masterclass_admin.html" style="display:none">Admin Panel</a>
     <span class="logout" onclick="logout()">Logout</span>
   </div>
 </header>
 
 <div class="container">
   <h2>Welcome to the Masterclass</h2>
-  <p>You now have full access to the course materials.</p>
+  <p class="subtitle">You now have full access to the course materials.</p>
 
   <div class="grid">
 
-    <div class="card">
+    <div class="card" onclick="location.href='recorded_classes.html'">
       <h3>📹 Recorded Classes</h3>
-      <ul>
-        <li>Week 1 – Introduction</li>
-        <li>Week 2 – Core Concepts</li>
-        <li>Week 3 – Practical Session</li>
-      </ul>
+      <p>Watch week-wise recorded sessions</p>
     </div>
 
-    <div class="card">
+    <div class="card" onclick="location.href='course_materials.html'">
       <h3>📂 Course Materials</h3>
-      <ul>
-        <li>PDF Notes</li>
-        <li>Reference Files</li>
-      </ul>
+      <p>PDF notes, reference files</p>
     </div>
 
-    <div class="card">
+    <div class="card" onclick="location.href='assignments.html'">
       <h3>📝 Assignments</h3>
-      <ul>
-        <li>Assignment 1</li>
-        <li>Assignment 2</li>
-      </ul>
+      <p>Practice tasks & submissions</p>
     </div>
 
-    <div class="card">
+    <div class="card" onclick="location.href='downloads.html'">
       <h3>⬇️ Software Downloads</h3>
-      <ul>
-        <li>Required Tools</li>
-        <li>Sample Files</li>
-      </ul>
+      <p>Required tools & sample files</p>
     </div>
 
   </div>
 </div>
 </div>
 
-<!-- 🔥 Dashboard Logic -->
 <script type="module">
-  import { onAuthStateChanged, signOut }
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { doc, getDoc }
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  const auth = window.auth;
-  const db = window.db;
+import { doc, getDoc }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      location.href = "masterclass_login.html";
-      return;
-    }
+const auth = window.auth;
+const db = window.db;
 
-    try {
-      // Check user document
-      const userSnap = await getDoc(doc(db, "users", user.uid));
-      if (!userSnap.exists()) {
-        location.href = "masterclass_login.html";
-        return;
-      }
+/* AUTH CHECK */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    location.href = "masterclass_login.html";
+    return;
+  }
 
-      // Check paid access
-      if (userSnap.data().paid === true) {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("content").classList.remove("hidden");
-
-        // Admin check
-        const adminSnap = await getDoc(doc(db, "admins", user.uid));
-        if (adminSnap.exists()) {
-          document.getElementById("adminBtn").style.display = "inline";
-        }
-
-      } else {
-        alert("Your access is not approved yet.");
-        await signOut(auth);
-        location.href = "masterclass_login.html";
-      }
-
-    } catch (e) {
-      console.error(e);
-      await signOut(auth);
-      location.href = "masterclass_login.html";
-    }
-  });
-
-  window.logout = async () => {
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+  if (!userSnap.exists() || userSnap.data().paid !== true) {
     await signOut(auth);
     location.href = "masterclass_login.html";
-  };
+    return;
+  }
+
+  // SHOW CONTENT
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("content").classList.remove("hidden");
+
+  // ADMIN CHECK
+  const adminSnap = await getDoc(doc(db, "admins", user.uid));
+  if (adminSnap.exists()) {
+    document.getElementById("adminBtn").style.display = "inline";
+  }
+});
+
+/* LOGOUT */
+window.logout = async () => {
+  await signOut(auth);
+  location.href = "masterclass_login.html";
+};
 </script>
 
 </body>

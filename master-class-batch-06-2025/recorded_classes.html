@@ -2,20 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Recorded Classes | PT Experts Masterclass</title>
+<title>Recorded Classes – PT Experts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase shared init -->
+<!-- Firebase init -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:#f8fafc;
+  background:#f4f7fb;
 }
-
-/* HEADER */
 header{
   background:#0a1a32;
   color:#fff;
@@ -24,81 +22,99 @@ header{
   justify-content:space-between;
   align-items:center;
 }
-.logout{
-  cursor:pointer;
-  color:#facc15;
+header a{
+  color:#22c55e;
   font-weight:600;
+  text-decoration:none;
 }
-
-/* LAYOUT */
 .container{
-  max-width:1100px;
+  max-width:1000px;
   margin:auto;
   padding:1.5rem;
 }
-h2{
-  margin-bottom:1rem;
+h2{margin-bottom:1rem}
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
-
-/* CARD */
-.card{
+.item{
   background:#fff;
-  border-radius:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-  padding:1rem;
-  margin-bottom:1.5rem;
-}
-.card h3{
-  margin:.3rem 0 1rem;
-}
-
-/* VIDEO */
-iframe{
-  width:100%;
-  height:420px;
+  padding:1rem 1.2rem;
   border-radius:12px;
-  border:none;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
-
-/* LOCKED */
-.locked{
-  background:#f1f5f9;
-  color:#64748b;
-  padding:2rem;
-  border-radius:12px;
-  text-align:center;
+.item.locked{
+  opacity:.6;
+}
+.item.disabled{
+  opacity:.4;
+}
+.badge{
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:.75rem;
   font-weight:600;
 }
-
-/* LOADING */
+.badge.locked{background:#fde68a;color:#92400e}
+.badge.disabled{background:#e5e7eb;color:#374151}
+.badge.open{background:#dcfce7;color:#166534}
+.play{
+  padding:6px 14px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+}
+.play.open{background:#22c55e;color:#fff}
+.play.locked{background:#facc15}
+.play.disabled{background:#e5e7eb}
 .loading{
-  min-height:100vh;
+  min-height:70vh;
   display:flex;
   align-items:center;
   justify-content:center;
   color:#64748b;
-  font-size:1.1rem;
+}
+video{
+  width:100%;
+  border-radius:12px;
+  margin-top:20px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="loading" class="loading">Loading recorded classes…</div>
-
-<div id="content" style="display:none">
-
 <header>
-  <strong>📹 Recorded Classes</strong>
-  <span class="logout" onclick="logout()">Logout</span>
+  <a href="masterclass_index.html">← Back</a>
+  <span>Recorded Classes</span>
 </header>
 
-<div class="container" id="videoContainer"></div>
+<div class="container">
+
+  <div id="loading" class="loading">Loading classes…</div>
+
+  <div id="list" class="list"></div>
+
+  <!-- VIDEO PLAYER -->
+  <div id="playerBox" style="display:none">
+    <h3 id="videoTitle"></h3>
+    <iframe id="player"
+      width="100%"
+      height="420"
+      style="border-radius:12px;border:none"
+      allowfullscreen>
+    </iframe>
+  </div>
 
 </div>
 
 <script type="module">
-import { onAuthStateChanged, signOut }
+import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
@@ -113,86 +129,81 @@ import {
 const auth = window.auth;
 const db = window.db;
 
-const courseRef = collection(
-  db,
-  "courses",
-  "masterclass_06_2025",
-  "recorded_classes"
-);
+const list = document.getElementById("list");
+const loading = document.getElementById("loading");
 
-/* ---------- AUTH CHECK ---------- */
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){
-    location.href="masterclass_login.html";
-    return;
-  }
+/* AUTH CHECK */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return location.href="masterclass_login.html";
 
   const userSnap = await getDoc(doc(db,"users",user.uid));
-  if(!userSnap.exists() || userSnap.data().paid !== true){
-    alert("Access not approved yet");
-    location.href="masterclass_login.html";
-    return;
+  if (!userSnap.exists() || userSnap.data().paid !== true) {
+    return location.href="masterclass_login.html";
   }
 
   loadVideos();
 });
 
-/* ---------- LOAD VIDEOS ---------- */
+/* LOAD VIDEOS */
 async function loadVideos(){
-  const container=document.getElementById("videoContainer");
-  container.innerHTML="";
+  list.innerHTML="";
+  loading.style.display="flex";
 
-  const q=query(courseRef,orderBy("order"));
-  const snap=await getDocs(q);
+  const q = query(
+    collection(db,"courses","masterclass_06_2025","recorded_classes"),
+    orderBy("order","asc")
+  );
+
+  const snap = await getDocs(q);
 
   snap.forEach(d=>{
-    const v=d.data();
+    const v = d.data();
 
-    // ❌ Disabled videos are hidden completely
-    if(!v.enabled) return;
-
-    // 🔒 Locked
-    if(v.locked){
-      container.innerHTML+=`
-        <div class="card">
-          <h3>${v.title}</h3>
-          <div class="locked">🔒 This content will be unlocked soon</div>
-        </div>
-      `;
-      return;
+    let state = "open";
+    let badge = "Available";
+    if (!v.enabled) {
+      state="disabled"; badge="Disabled";
+    } else if (v.locked) {
+      state="locked"; badge="Locked";
     }
 
-    // ✅ Enabled & unlocked
-    container.innerHTML+=`
-      <div class="card">
-        <h3>${v.title}</h3>
-        <iframe src="${convertToEmbed(v.videoUrl)}" allowfullscreen></iframe>
+    const row = document.createElement("div");
+    row.className = `item ${state}`;
+    row.innerHTML = `
+      <div>
+        <strong>${v.title}</strong><br>
+        <span class="badge ${state}">${badge}</span>
       </div>
+      <button class="play ${state}">
+        ${state==="open"?"Play":"🔒"}
+      </button>
     `;
+
+    if (state==="open") {
+      row.querySelector("button").onclick=()=>playVideo(v.title,v.videoUrl);
+    }
+
+    list.appendChild(row);
   });
 
-  document.getElementById("loading").style.display="none";
-  document.getElementById("content").style.display="block";
+  loading.style.display="none";
 }
 
-/* ---------- CONVERT TO EMBED ---------- */
-function convertToEmbed(url){
-  // YouTube
-  if(url.includes("youtube.com/watch?v=")){
-    return url.replace("watch?v=","embed/");
-  }
-  if(url.includes("youtu.be/")){
-    return url.replace("youtu.be/","www.youtube.com/embed/");
-  }
-  // Otherwise direct embed (Drive / MP4)
-  return url;
-}
+/* PLAY VIDEO */
+function playVideo(title,url){
+  document.getElementById("videoTitle").innerText = title;
 
-/* ---------- LOGOUT ---------- */
-window.logout = async ()=>{
-  await signOut(auth);
-  location.href="masterclass_login.html";
-};
+  // Supports YouTube embed links
+  let embedUrl = url;
+  if (url.includes("youtube.com/watch")) {
+    const id = new URL(url).searchParams.get("v");
+    embedUrl = `https://www.youtube.com/embed/${id}`;
+  }
+
+  document.getElementById("player").src = embedUrl;
+  document.getElementById("playerBox").style.display="block";
+  window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+}
 </script>
 
 </body>
