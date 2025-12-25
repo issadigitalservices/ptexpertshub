@@ -5,7 +5,6 @@
 <title>Live Recorded Classes</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase shared init -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -13,10 +12,7 @@ body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:#f4f7fb;
-  color:#0f172a;
 }
-
-/* HEADER */
 header{
   background:#0a1a32;
   color:#fff;
@@ -30,22 +26,15 @@ header a{
   text-decoration:none;
   font-weight:600;
 }
-
-/* LAYOUT */
 .container{
   max-width:1200px;
   margin:auto;
   padding:2rem 1.5rem;
 }
-h2{
-  margin-bottom:1.2rem;
-}
-
-/* GRID */
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:1.2rem;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:1.5rem;
 }
 .card{
   background:#fff;
@@ -53,47 +42,47 @@ h2{
   padding:1.2rem;
   box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
-.card.locked{
-  opacity:.6;
-}
-.card h3{
-  margin:.5rem 0 .4rem;
-}
 iframe{
   width:100%;
   height:200px;
-  border-radius:12px;
   border:none;
+  border-radius:12px;
 }
 .lock{
+  padding:2rem;
   text-align:center;
-  padding:2rem 1rem;
   background:#f1f5f9;
   border-radius:12px;
-  font-weight:600;
   color:#dc2626;
+  font-weight:600;
 }
-
-/* LOADING */
+.fallback{
+  margin-top:10px;
+  text-align:center;
+}
+.fallback a{
+  display:inline-block;
+  padding:.5rem 1rem;
+  background:#dc2626;
+  color:#fff;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:600;
+}
 .loading{
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
   color:#64748b;
-  font-size:1.05rem;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOADING -->
-<div id="loading" class="loading">
-  Loading live recorded classes…
-</div>
+<div id="loading" class="loading">Loading live recorded classes…</div>
 
-<!-- CONTENT -->
 <div id="content" style="display:none">
 
 <header>
@@ -117,80 +106,64 @@ import {
 
 const auth = window.auth;
 const db = window.db;
-
-/* 🔑 COURSE ID — MUST MATCH ADMIN + RULES */
 const COURSE_ID = "masterclass_batch_06_2025";
 
 const grid = document.getElementById("grid");
 const loading = document.getElementById("loading");
 const content = document.getElementById("content");
 
-/* AUTH + PAID CHECK */
+/* AUTH */
 onAuthStateChanged(auth, async(user)=>{
   if(!user){
     location.href="masterclass_login.html";
     return;
   }
 
-  const userSnap = await getDoc(doc(db,"users",user.uid));
-  const paid = userSnap.exists() && userSnap.data().paid === true;
+  const snap = await getDoc(doc(db,"users",user.uid));
+  const paid = snap.exists() && snap.data().paid === true;
 
   loadClasses(paid);
 });
 
-/* LOAD CLASSES */
+/* LOAD */
 async function loadClasses(isPaid){
-  try{
-    const q = query(
-      collection(db, "courses", COURSE_ID, "live_record_classes"),
-      orderBy("order","asc")
-    );
+  const q = query(
+    collection(db,"courses",COURSE_ID,"live_record_classes"),
+    orderBy("order","asc")
+  );
 
-    const snap = await getDocs(q);
-    grid.innerHTML="";
+  const snap = await getDocs(q);
+  grid.innerHTML="";
 
-    if(snap.empty){
-      grid.innerHTML = `
-        <div style="
-          grid-column:1/-1;
-          text-align:center;
-          padding:2rem;
-          color:#64748b">
-          No live recorded classes available yet.
-        </div>`;
-    }
+  snap.forEach(d=>{
+    const x = d.data();
+    const locked = x.locked && !isPaid;
 
-    snap.forEach(d=>{
-      const x = d.data();
-      const locked = x.locked && !isPaid;
+    grid.innerHTML += `
+      <div class="card">
+        <h3>${x.title}</h3>
 
-      grid.innerHTML += `
-        <div class="card ${locked ? "locked":""}">
-          <h3>${x.title}</h3>
-          ${
-            locked
-            ? `<div class="lock">
-                 🔒 This class is locked.<br>
-                 Purchase the course to unlock.
-               </div>`
-            : `<iframe src="${x.videoUrl}" allowfullscreen></iframe>`
-          }
-        </div>`;
-    });
+        ${
+          locked
+          ? `<div class="lock">🔒 Purchase course to unlock</div>`
+          : `
+            <iframe
+              src="${x.videoUrl}"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
 
-  }catch(err){
-    console.error("Live Records Load Error:", err);
-    grid.innerHTML = `
-      <div style="
-        grid-column:1/-1;
-        text-align:center;
-        padding:2rem;
-        color:#dc2626">
-        Error loading live recorded classes.
-      </div>`;
-  }
+            <div class="fallback">
+              <a href="${x.viewUrl}" target="_blank">
+                ▶ Watch on YouTube
+              </a>
+            </div>
+          `
+        }
+      </div>
+    `;
+  });
 
-  /* ALWAYS EXIT LOADING */
   loading.style.display="none";
   content.style.display="block";
 }
