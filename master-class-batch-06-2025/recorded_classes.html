@@ -14,6 +14,8 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:#f4f7fb;
 }
+
+/* HEADER */
 header{
   background:#0a1a32;
   color:#fff;
@@ -27,12 +29,15 @@ header a{
   font-weight:600;
   text-decoration:none;
 }
+
+/* LAYOUT */
 .container{
   max-width:1000px;
   margin:auto;
   padding:1.5rem;
 }
-h2{margin-bottom:1rem}
+
+/* LIST */
 .list{
   display:flex;
   flex-direction:column;
@@ -47,66 +52,78 @@ h2{margin-bottom:1rem}
   justify-content:space-between;
   align-items:center;
 }
-.item.locked{
-  opacity:.6;
-}
-.item.disabled{
-  opacity:.4;
-}
+.item.disabled{opacity:.4}
+.item.locked{opacity:.6}
+
+/* BADGES */
 .badge{
   padding:4px 10px;
   border-radius:20px;
   font-size:.75rem;
   font-weight:600;
 }
+.badge.open{background:#dcfce7;color:#166534}
 .badge.locked{background:#fde68a;color:#92400e}
 .badge.disabled{background:#e5e7eb;color:#374151}
-.badge.open{background:#dcfce7;color:#166534}
+
+/* PLAY */
 .play{
-  padding:6px 14px;
+  padding:6px 16px;
   border-radius:8px;
   border:none;
   cursor:pointer;
-  font-weight:600;
+  font-weight:700;
 }
 .play.open{background:#22c55e;color:#fff}
 .play.locked{background:#facc15}
 .play.disabled{background:#e5e7eb}
+
+/* PLAYER */
+#playerBox{
+  margin-top:30px;
+}
+iframe{
+  width:100%;
+  height:420px;
+  border:none;
+  border-radius:12px;
+}
+
+/* CHECK */
+.check{
+  color:#22c55e;
+  font-size:1.1rem;
+  margin-left:8px;
+}
+
 .loading{
-  min-height:70vh;
+  min-height:60vh;
   display:flex;
   align-items:center;
   justify-content:center;
   color:#64748b;
 }
-video{
-  width:100%;
-  border-radius:12px;
-  margin-top:20px;
-}
 </style>
 </head>
 
-<body>
+<body oncontextmenu="return false">
 
 <header>
   <a href="masterclass_index.html">← Back</a>
-  <span>Recorded Classes</span>
+  <strong>Recorded Classes</strong>
 </header>
 
 <div class="container">
 
   <div id="loading" class="loading">Loading classes…</div>
-
   <div id="list" class="list"></div>
 
-  <!-- VIDEO PLAYER -->
+  <!-- PLAYER -->
   <div id="playerBox" style="display:none">
     <h3 id="videoTitle"></h3>
     <iframe id="player"
-      width="100%"
-      height="420"
-      style="border-radius:12px;border:none"
+      sandbox="allow-scripts allow-same-origin allow-presentation"
+      allow="encrypted-media; picture-in-picture"
       allowfullscreen>
     </iframe>
   </div>
@@ -122,6 +139,8 @@ import {
   getDocs,
   doc,
   getDoc,
+  setDoc,
+  updateDoc,
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -132,15 +151,20 @@ const db = window.db;
 const list = document.getElementById("list");
 const loading = document.getElementById("loading");
 
+let currentUserId = null;
+let lastWatched = null;
+
 /* AUTH CHECK */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return location.href="masterclass_login.html";
+onAuthStateChanged(auth, async (user)=>{
+  if(!user) return location.href="masterclass_login.html";
+  currentUserId = user.uid;
 
   const userSnap = await getDoc(doc(db,"users",user.uid));
-  if (!userSnap.exists() || userSnap.data().paid !== true) {
+  if(!userSnap.exists() || userSnap.data().paid !== true){
     return location.href="masterclass_login.html";
   }
 
+  lastWatched = userSnap.data().lastWatched || null;
   loadVideos();
 });
 
@@ -156,22 +180,25 @@ async function loadVideos(){
 
   const snap = await getDocs(q);
 
+  let firstPlayable = null;
+
   snap.forEach(d=>{
     const v = d.data();
+    const vid = d.id;
 
-    let state = "open";
-    let badge = "Available";
-    if (!v.enabled) {
-      state="disabled"; badge="Disabled";
-    } else if (v.locked) {
-      state="locked"; badge="Locked";
-    }
+    let state="open", badge="Available";
+    if(!v.enabled){ state="disabled"; badge="Disabled"; }
+    else if(v.locked){ state="locked"; badge="Locked"; }
+
+    const completed = v.completedBy?.includes(currentUserId);
 
     const row = document.createElement("div");
-    row.className = `item ${state}`;
-    row.innerHTML = `
+    row.className=`item ${state}`;
+    row.innerHTML=`
       <div>
-        <strong>${v.title}</strong><br>
+        <strong>${v.title}</strong>
+        ${completed ? `<span class="check">✔</span>` : ""}
+        <br>
         <span class="badge ${state}">${badge}</span>
       </div>
       <button class="play ${state}">
@@ -179,30 +206,67 @@ async function loadVideos(){
       </button>
     `;
 
-    if (state==="open") {
-      row.querySelector("button").onclick=()=>playVideo(v.title,v.videoUrl);
+    if(state==="open"){
+      row.querySelector("button").onclick=()=>playVideo(vid,v.title,v.videoUrl);
+      if(!firstPlayable) firstPlayable = {id:vid, ...v};
     }
 
     list.appendChild(row);
   });
 
   loading.style.display="none";
+
+  // AUTO OPEN LAST WATCHED OR FIRST VIDEO
+  if(lastWatched){
+    const docSnap = await getDoc(doc(db,"courses","masterclass_06_2025","recorded_classes",lastWatched));
+    if(docSnap.exists()){
+      const v = docSnap.data();
+      playVideo(lastWatched,v.title,v.videoUrl);
+      return;
+    }
+  }
+
+  if(firstPlayable){
+    playVideo(firstPlayable.id,firstPlayable.title,firstPlayable.videoUrl);
+  }
 }
 
 /* PLAY VIDEO */
-function playVideo(title,url){
+async function playVideo(id,title,url){
   document.getElementById("videoTitle").innerText = title;
 
-  // Supports YouTube embed links
   let embedUrl = url;
-  if (url.includes("youtube.com/watch")) {
-    const id = new URL(url).searchParams.get("v");
-    embedUrl = `https://www.youtube.com/embed/${id}`;
+
+  if(url.includes("youtube.com/watch")){
+    const v = new URL(url).searchParams.get("v");
+    embedUrl = `https://www.youtube.com/embed/${v}`;
+  }
+
+  if(url.includes("youtube.com/playlist")){
+    const listId = new URL(url).searchParams.get("list");
+    embedUrl = `https://www.youtube.com/embed/videoseries?list=${listId}`;
   }
 
   document.getElementById("player").src = embedUrl;
   document.getElementById("playerBox").style.display="block";
+
+  // SAVE LAST WATCHED + COMPLETION
+  await updateDoc(doc(db,"users",currentUserId),{
+    lastWatched:id
+  });
+
+  await updateDoc(
+    doc(db,"courses","masterclass_06_2025","recorded_classes",id),
+    { completedBy: Array.from(new Set([...(await getCompleted(id)), currentUserId])) }
+  );
+
   window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+}
+
+/* GET COMPLETION LIST */
+async function getCompleted(id){
+  const snap = await getDoc(doc(db,"courses","masterclass_06_2025","recorded_classes",id));
+  return snap.exists() && snap.data().completedBy ? snap.data().completedBy : [];
 }
 </script>
 

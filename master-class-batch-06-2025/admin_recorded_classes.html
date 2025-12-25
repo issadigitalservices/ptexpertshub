@@ -41,9 +41,6 @@ header a{
   margin:auto;
   padding:2rem 1.5rem;
 }
-h2{
-  margin-bottom:1rem;
-}
 
 /* TABLE */
 table{
@@ -57,7 +54,6 @@ table{
 th,td{
   padding:.8rem;
   border-bottom:1px solid #e2e8f0;
-  text-align:left;
 }
 th{
   background:#f1f5f9;
@@ -79,15 +75,9 @@ button{
   cursor:pointer;
   font-weight:700;
 }
-.save{
-  background:#2563eb;
-  color:#fff;
-}
-.add{
-  background:#16a34a;
-  color:#fff;
-  margin-top:15px;
-}
+.save{background:#2563eb;color:#fff}
+.delete{background:#ef4444;color:#fff}
+.add{background:#16a34a;color:#fff;margin-top:15px}
 
 /* LOADING */
 .loading{
@@ -95,7 +85,6 @@ button{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:1.1rem;
   color:#64748b;
 }
 </style>
@@ -110,15 +99,13 @@ button{
 <header>
   <strong>📹 Recorded Classes Manager</strong>
   <div style="display:flex;gap:15px;align-items:center">
-    <a href="masterclass_admin.html">⬅ Back to Dashboard</a>
-    <a href="masterclass_index.html" target="_blank">👤 Open User Page</a>
+    <a href="masterclass_admin.html">⬅ Dashboard</a>
+    <a href="masterclass_index.html" target="_blank">👤 User Page</a>
     <span class="logout" onclick="logout()">Logout</span>
   </div>
 </header>
 
 <div class="container">
-
-  <h2>Recorded Classes</h2>
 
   <table>
     <thead>
@@ -128,7 +115,7 @@ button{
         <th>Order</th>
         <th>Enabled</th>
         <th>Locked</th>
-        <th>Save</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody id="videoRows"></tbody>
@@ -150,6 +137,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -164,91 +152,98 @@ const courseRef = collection(
   "recorded_classes"
 );
 
-/* ---------- ADMIN CHECK ---------- */
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){
-    location.href="masterclass_login.html";
+/* ---------- AUTH CHECK ---------- */
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    location.href = "masterclass_login.html";
     return;
   }
 
-  const adminSnap = await getDoc(doc(db,"admins",user.uid));
-  if(!adminSnap.exists()){
+  const adminSnap = await getDoc(doc(db, "admins", user.uid));
+  if (!adminSnap.exists()) {
     alert("Admin access only");
-    location.href="masterclass_index.html";
+    location.href = "masterclass_index.html";
     return;
   }
 
-  document.getElementById("loading").style.display="none";
-  document.getElementById("panel").style.display="block";
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("panel").style.display = "block";
   loadVideos();
 });
 
 /* ---------- LOAD VIDEOS ---------- */
 async function loadVideos(){
-  const rows=document.getElementById("videoRows");
-  rows.innerHTML="";
+  const rows = document.getElementById("videoRows");
+  rows.innerHTML = "";
 
-  const q = query(courseRef, orderBy("order"));
+  const q = query(courseRef, orderBy("order","asc"));
   const snap = await getDocs(q);
 
-  snap.forEach(d=>{
-    const v=d.data();
-    rows.innerHTML+=`
+  if (snap.empty) {
+    rows.innerHTML = `
       <tr>
-        <td>
-          <input type="text" id="t_${d.id}" value="${v.title||""}">
+        <td colspan="6" style="text-align:center;color:#64748b">
+          No recorded classes added yet.
         </td>
-        <td>
-          <input type="text" id="u_${d.id}" value="${v.videoUrl||""}">
-        </td>
-        <td>
-          <input type="number" id="o_${d.id}" value="${v.order||1}" style="width:70px">
-        </td>
-        <td>
-          <input type="checkbox" id="e_${d.id}" ${v.enabled?"checked":""}>
-        </td>
-        <td>
-          <input type="checkbox" id="l_${d.id}" ${v.locked?"checked":""}>
-        </td>
-        <td>
+      </tr>`;
+    return;
+  }
+
+  snap.forEach(d=>{
+    const v = d.data();
+    rows.innerHTML += `
+      <tr>
+        <td><input id="t_${d.id}" value="${v.title || ""}"></td>
+        <td><input id="u_${d.id}" value="${v.videoUrl || ""}"></td>
+        <td><input type="number" id="o_${d.id}" value="${v.order || 1}" style="width:70px"></td>
+        <td><input type="checkbox" id="e_${d.id}" ${v.enabled ? "checked" : ""}></td>
+        <td><input type="checkbox" id="l_${d.id}" ${v.locked ? "checked" : ""}></td>
+        <td style="display:flex;gap:8px">
           <button class="save" onclick="saveVideo('${d.id}')">💾</button>
+          <button class="delete" onclick="deleteVideo('${d.id}')">🗑</button>
         </td>
       </tr>
     `;
   });
 }
 
-/* ---------- SAVE VIDEO ---------- */
-window.saveVideo = async (id)=>{
+/* ---------- SAVE ---------- */
+window.saveVideo = async id => {
   await updateDoc(doc(courseRef,id),{
-    title:document.getElementById(`t_${id}`).value,
-    videoUrl:document.getElementById(`u_${id}`).value,
-    order:Number(document.getElementById(`o_${id}`).value),
-    enabled:document.getElementById(`e_${id}`).checked,
-    locked:document.getElementById(`l_${id}`).checked
+    title: document.getElementById(`t_${id}`).value,
+    videoUrl: document.getElementById(`u_${id}`).value,
+    order: Number(document.getElementById(`o_${id}`).value),
+    enabled: document.getElementById(`e_${id}`).checked,
+    locked: document.getElementById(`l_${id}`).checked
   });
   alert("Saved successfully");
   loadVideos();
 };
 
+/* ---------- DELETE ---------- */
+window.deleteVideo = async id => {
+  if (!confirm("Are you sure you want to delete this week?")) return;
+  await deleteDoc(doc(courseRef,id));
+  loadVideos();
+};
+
 /* ---------- ADD NEW WEEK ---------- */
-window.addNewWeek = async ()=>{
-  const id="week_"+Date.now();
-  await setDoc(doc(courseRef,id),{
-    title:"New Week",
-    videoUrl:"",
-    order:999,
-    enabled:false,
-    locked:true,
-    createdAt:new Date()
+window.addNewWeek = async () => {
+  await setDoc(doc(courseRef, "week_" + Date.now()), {
+    title: "New Week",
+    videoUrl: "",
+    order: 999,
+    enabled: false,
+    locked: true,
+    createdAt: new Date()
   });
   loadVideos();
 };
 
 /* ---------- LOGOUT ---------- */
-window.logout = async ()=>{
+window.logout = async () => {
   await signOut(auth);
-  location.href="masterclass_login.html";
+  location.href = "masterclass_login.html";
 };
 </script>
 
