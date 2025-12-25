@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Live Record Classes – Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script type="module" src="firebase-config.js"></script>
+
+<style>
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;background:#f4f7fb}
+header{
+  background:#0a1a32;color:#fff;
+  padding:1rem 1.5rem;
+  display:flex;justify-content:space-between;align-items:center
+}
+header a{color:#22c55e;font-weight:600;text-decoration:none}
+.logout{cursor:pointer;color:#facc15;font-weight:600}
+.container{max-width:1200px;margin:auto;padding:2rem 1.5rem}
+h2{margin-bottom:1rem}
+
+.form{
+  background:#fff;padding:1.5rem;border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  margin-bottom:2rem
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1rem
+}
+input,select,button{
+  padding:.65rem .8rem;border-radius:10px;
+  border:1px solid #e2e8f0;font-size:.95rem
+}
+button{background:#0a1a32;color:#fff;border:none;cursor:pointer}
+button:hover{opacity:.9}
+
+table{
+  width:100%;border-collapse:collapse;background:#fff;
+  border-radius:16px;overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,.08)
+}
+th,td{padding:.75rem;border-bottom:1px solid #e2e8f0;text-align:left}
+th{background:#f1f5f9;font-size:.9rem}
+
+.action{cursor:pointer;font-weight:600;margin-right:10px}
+.view{color:#16a34a}
+.edit{color:#2563eb}
+.lock{color:#ca8a04}
+.delete{color:#dc2626}
+</style>
+</head>
+
+<body>
+
+<header>
+  <strong>Live Record Classes – Admin</strong>
+  <div>
+    <a href="masterclass_admin.html">⬅ Dashboard</a>
+    <span class="logout" onclick="logout()">Logout</span>
+  </div>
+</header>
+
+<div class="container">
+
+<h2 id="formTitle">Add Live Record Class</h2>
+
+<div class="form">
+  <div class="form-grid">
+    <input id="title" placeholder="Class Title">
+    <input id="videoUrl" placeholder="Paste YouTube video or playlist URL">
+    <input id="order" type="number" placeholder="Display Order">
+    <select id="locked">
+      <option value="true">Locked (Paid)</option>
+      <option value="false">Unlocked</option>
+    </select>
+    <button onclick="saveRecord()">Save Class</button>
+  </div>
+</div>
+
+<h2>Live Recorded Classes</h2>
+
+<table>
+<thead>
+<tr>
+  <th>Order</th>
+  <th>Title</th>
+  <th>Locked</th>
+  <th>Actions</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
+</div>
+
+<script type="module">
+import { onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  collection, addDoc, getDocs, deleteDoc, doc,
+  updateDoc, orderBy, query
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const auth = window.auth;
+const db = window.db;
+const COURSE_ID = "masterclass_batch_06_2025";
+const colRef = collection(db,"courses",COURSE_ID,"live_record_classes");
+
+const titleInput = document.getElementById("title");
+const videoUrlInput = document.getElementById("videoUrl");
+const orderInput = document.getElementById("order");
+const lockedInput = document.getElementById("locked");
+const body = document.getElementById("tableBody");
+const formTitle = document.getElementById("formTitle");
+
+let editId = null;
+
+/* ADMIN CHECK */
+onAuthStateChanged(auth,(u)=>{
+  if(!u) location.href="masterclass_login.html";
+});
+
+/* ===== YOUTUBE URL PARSER (VIDEO + PLAYLIST SAFE) ===== */
+function parseYouTubeUrl(raw){
+  const u = new URL(raw);
+  const list = u.searchParams.get("list");
+  const v = u.searchParams.get("v");
+
+  // Playlist page
+  if(u.pathname.includes("playlist") && list){
+    return {
+      embed:`https://www.youtube.com/embed/videoseries?list=${list}`,
+      view:`https://www.youtube.com/playlist?list=${list}`
+    };
+  }
+
+  // Video inside playlist
+  if(list && v){
+    return {
+      embed:`https://www.youtube.com/embed/videoseries?list=${list}`,
+      view:`https://www.youtube.com/watch?v=${v}&list=${list}`
+    };
+  }
+
+  // Normal video
+  if(v){
+    return {
+      embed:`https://www.youtube.com/embed/${v}`,
+      view:`https://www.youtube.com/watch?v=${v}`
+    };
+  }
+
+  // youtu.be short link
+  if(u.hostname.includes("youtu.be")){
+    const id = u.pathname.replace("/","");
+    return {
+      embed:`https://www.youtube.com/embed/${id}`,
+      view:`https://www.youtube.com/watch?v=${id}`
+    };
+  }
+
+  return null;
+}
+
+/* LOAD DATA */
+async function loadData(){
+  body.innerHTML="";
+  const snap = await getDocs(query(colRef,orderBy("order","asc")));
+  snap.forEach(d=>{
+    const x = d.data();
+    body.innerHTML+=`
+      <tr>
+        <td>${x.order}</td>
+        <td>${x.title}</td>
+        <td>${x.locked?"Yes":"No"}</td>
+        <td>
+          <span class="action view" onclick="viewRec('${x.viewUrl}')">View</span>
+          <span class="action edit"
+            onclick="editRec('${d.id}','${x.title}','${x.viewUrl}',${x.order},${x.locked})">Edit</span>
+          <span class="action lock"
+            onclick="toggleLock('${d.id}',${x.locked})">
+            ${x.locked?"Unlock":"Lock"}
+          </span>
+          <span class="action delete" onclick="delRec('${d.id}')">Delete</span>
+        </td>
+      </tr>`;
+  });
+}
+loadData();
+
+/* SAVE (ADD / UPDATE) */
+window.saveRecord = async ()=>{
+  const title = titleInput.value.trim();
+  const raw = videoUrlInput.value.trim();
+  const order = Number(orderInput.value);
+  const locked = lockedInput.value==="true";
+
+  const parsed = parseYouTubeUrl(raw);
+  if(!title || !parsed || !order){
+    alert("Please enter valid data");
+    return;
+  }
+
+  if(editId){
+    await updateDoc(doc(db,"courses",COURSE_ID,"live_record_classes",editId),
+      {title,videoUrl:parsed.embed,viewUrl:parsed.view,order,locked});
+    editId=null;
+    formTitle.textContent="Add Live Record Class";
+  }else{
+    await addDoc(colRef,{
+      title,
+      videoUrl:parsed.embed,
+      viewUrl:parsed.view,
+      order,
+      locked,
+      createdAt:Date.now()
+    });
+  }
+
+  titleInput.value="";
+  videoUrlInput.value="";
+  orderInput.value="";
+  lockedInput.value="true";
+  loadData();
+};
+
+/* ACTIONS */
+window.viewRec = (url)=> window.open(url,"_blank");
+
+window.editRec = (id,t,url,o,l)=>{
+  editId=id;
+  formTitle.textContent="Edit Live Record Class";
+  titleInput.value=t;
+  videoUrlInput.value=url;
+  orderInput.value=o;
+  lockedInput.value=l?"true":"false";
+};
+
+window.toggleLock = async(id,current)=>{
+  await updateDoc(doc(db,"courses",COURSE_ID,"live_record_classes",id),
+    {locked:!current});
+  loadData();
+};
+
+window.delRec = async(id)=>{
+  if(confirm("Delete this class?")){
+    await deleteDoc(doc(db,"courses",COURSE_ID,"live_record_classes",id));
+    loadData();
+  }
+};
+
+window.logout = async()=>{
+  await signOut(auth);
+  location.href="masterclass_login.html";
+};
+</script>
+
+</body>
+</html>
