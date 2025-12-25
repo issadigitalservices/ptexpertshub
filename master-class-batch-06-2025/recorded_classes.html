@@ -50,10 +50,7 @@ header a{color:#22c55e;font-weight:600;text-decoration:none}
   font-weight:700;
   cursor:pointer;
 }
-.play:hover{
-  opacity:.9;
-}
-
+.play:hover{opacity:.9}
 .play.play{background:#22c55e;color:#fff}
 .play.rewatch{background:#2563eb;color:#fff}
 .play.locked{background:#e5e7eb}
@@ -116,6 +113,7 @@ const COURSE_ID="masterclass_batch_06_2025";
 
 let currentUserId=null;
 let currentVideoId=null;
+let allowedVideos=null; // 🔐 ACCESS CONTROL
 
 const list=document.getElementById("list");
 const loading=document.getElementById("loading");
@@ -131,6 +129,9 @@ onAuthStateChanged(auth, async user=>{
   if(!u.exists()||u.data().paid!==true)
     return location.href="masterclass_login.html";
 
+  // 🔐 ACCESS CONTROL
+  allowedVideos = u.data().access?.recorded_classes || null;
+
   loadVideos();
 });
 
@@ -145,10 +146,16 @@ async function loadVideos(){
   );
   const snap=await getDocs(q);
 
-  let allowNext=true, completedCount=0;
+  let allowNext=true, completedCount=0, visibleCount=0;
 
   snap.forEach(d=>{
     const v=d.data();
+
+    // 🔐 ACCESS CONTROL: hide if not allowed
+    if(allowedVideos && !allowedVideos.includes(d.id)) return;
+
+    visibleCount++;
+
     const done=v.completedBy?.includes(currentUserId);
     if(done) completedCount++;
 
@@ -181,24 +188,19 @@ async function loadVideos(){
     list.appendChild(row);
   });
 
-  const percent = Math.round((completedCount / snap.size) * 100);
+  const percent = visibleCount
+    ? Math.round((completedCount / visibleCount) * 100)
+    : 0;
 
-progress.innerHTML = `
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-    <strong>Progress</strong>
-    <span>${completedCount} / ${snap.size} (${percent}%)</span>
-  </div>
-
-  <div style="background:#e5e7eb;height:10px;border-radius:20px;overflow:hidden">
-    <div style="
-      width:${percent}%;
-      height:100%;
-      background:#22c55e;
-      transition:width .3s ease">
+  progress.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <strong>Progress</strong>
+      <span>${completedCount} / ${visibleCount} (${percent}%)</span>
     </div>
-  </div>
-`;
-
+    <div style="background:#e5e7eb;height:10px;border-radius:20px;overflow:hidden">
+      <div style="width:${percent}%;height:100%;background:#22c55e"></div>
+    </div>
+  `;
 
   loading.style.display="none";
 }
@@ -211,7 +213,6 @@ function playVideo(id,title,embedUrl,completed){
   document.getElementById("playerBox").style.display="block";
 
   finishBtn.style.display=completed?"none":"inline-block";
-
   window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 

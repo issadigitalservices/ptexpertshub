@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>User Access – Admin | PT Experts Masterclass</title>
+<title>User Progress – Admin | PT Experts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase (shared init) -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -24,26 +23,11 @@ header{
   justify-content:space-between;
   align-items:center;
 }
-header a{
-  color:#22c55e;
-  text-decoration:none;
-  font-weight:600;
-}
-.logout{
-  cursor:pointer;
-  color:#facc15;
-  font-weight:600;
-}
+header a{color:#22c55e;font-weight:600;text-decoration:none}
+.logout{cursor:pointer;color:#facc15;font-weight:600}
 
 /* LAYOUT */
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:2rem 1.5rem;
-}
-h2{
-  margin-bottom:1rem;
-}
+.container{max-width:1200px;margin:auto;padding:2rem 1.5rem}
 
 /* TABLE */
 table{
@@ -57,36 +41,68 @@ table{
 th,td{
   padding:.9rem;
   border-bottom:1px solid #e2e8f0;
-  text-align:left;
 }
-th{
-  background:#f1f5f9;
-  font-weight:700;
+th{background:#f1f5f9;font-weight:700}
+
+/* STATUS */
+.status-yes{color:#16a34a;font-weight:700}
+.status-no{color:#dc2626;font-weight:700}
+
+/* PROGRESS */
+.progress-wrap{
+  background:#e5e7eb;
+  border-radius:8px;
+  overflow:hidden;
+  height:8px;
+  margin:4px 0;
 }
-.status-yes{
-  color:#16a34a;
-  font-weight:700;
-}
-.status-no{
-  color:#dc2626;
-  font-weight:700;
+.progress-bar{
+  height:100%;
+  background:#22c55e;
 }
 
 /* BUTTONS */
 button{
-  padding:.4rem .9rem;
+  padding:.4rem .8rem;
   border:none;
   border-radius:8px;
   cursor:pointer;
   font-weight:700;
 }
-.approve{
-  background:#22c55e;
-  color:#fff;
+.approve{background:#22c55e;color:#fff}
+.revoke{background:#ef4444;color:#fff}
+.view{background:#2563eb;color:#fff}
+.access{background:#0ea5e9;color:#fff}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
 }
-.revoke{
-  background:#ef4444;
+.modal-box{
+  background:#fff;
+  width:460px;
+  max-height:85vh;
+  overflow:auto;
+  border-radius:14px;
+  padding:1.2rem;
+}
+.modal-box h3{margin-top:0}
+
+.section{margin-bottom:16px}
+.lesson{padding:.35rem 0}
+.lesson.done{color:#16a34a}
+.lesson.todo{color:#64748b}
+
+.close{
+  margin-top:12px;
+  background:#0a1a32;
   color:#fff;
+  width:100%;
 }
 
 /* LOADING */
@@ -95,7 +111,6 @@ button{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:1.1rem;
   color:#64748b;
 }
 </style>
@@ -108,103 +123,243 @@ button{
 <div id="panel" style="display:none">
 
 <header>
-  <strong>User Access Control</strong>
+  <strong>👥 User Progress – Admin</strong>
   <div style="display:flex;gap:15px;align-items:center">
-    <a href="masterclass_admin.html">⬅ Back to Dashboard</a>
-    <a href="masterclass_index.html" target="_blank">👤 Open User Page</a>
+    <a href="masterclass_admin.html">⬅ Dashboard</a>
     <span class="logout" onclick="logout()">Logout</span>
   </div>
 </header>
 
 <div class="container">
 
-  <h2>👥 Course Users</h2>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="userRows"></tbody>
-  </table>
+<table>
+<thead>
+<tr>
+  <th>Name</th>
+  <th>Email</th>
+  <th>Status</th>
+  <th>Progress</th>
+  <th>Action</th>
+</tr>
+</thead>
+<tbody id="userRows"></tbody>
+</table>
 
 </div>
+</div>
+
+<!-- VIEW PROGRESS MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <h3>Lesson Progress</h3>
+    <div id="lessonList"></div>
+    <button class="close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<!-- MANAGE ACCESS MODAL (NEW) -->
+<div id="accessModal" class="modal">
+  <div class="modal-box">
+    <h3>Manage Lesson Access</h3>
+    <div id="accessList"></div>
+    <button class="close" onclick="closeAccess()">Save & Close</button>
+  </div>
 </div>
 
 <script type="module">
 import { onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc
+  collection, getDocs, doc, getDoc, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const auth = window.auth;
 const db = window.db;
+const COURSE_ID = "masterclass_batch_06_2025";
 
-/* ---------- ADMIN CHECK ---------- */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    location.href = "masterclass_login.html";
-    return;
-  }
+let currentAccessUser = null;
+
+/* AUTH */
+onAuthStateChanged(auth, async user=>{
+  if(!user) return location.href="masterclass_login.html";
 
   const adminSnap = await getDoc(doc(db,"admins",user.uid));
-  if (!adminSnap.exists()) {
+  if(!adminSnap.exists()){
     alert("Admin access only");
-    location.href = "masterclass_index.html";
-    return;
+    return location.href="masterclass_index.html";
   }
 
-  document.getElementById("loading").style.display="none";
-  document.getElementById("panel").style.display="block";
+  loading.style.display="none";
+  panel.style.display="block";
   loadUsers();
 });
 
-/* ---------- LOAD USERS ---------- */
+/* HELPER */
+async function calcProgress(colRef, uid){
+  const snap = await getDocs(colRef);
+  let done = 0;
+  snap.forEach(d=>{
+    if(d.data().completedBy?.includes(uid)) done++;
+  });
+  return {
+    done,
+    total: snap.size,
+    percent: snap.size ? Math.round(done/snap.size*100) : 0,
+    snap
+  };
+}
+
+/* LOAD USERS */
 async function loadUsers(){
-  const rows=document.getElementById("userRows");
+  const rows = document.getElementById("userRows");
   rows.innerHTML="";
 
-  const snap=await getDocs(collection(db,"users"));
+  const usersSnap = await getDocs(collection(db,"users"));
 
-  snap.forEach(d=>{
-    const u=d.data();
-    rows.innerHTML+=`
+  for(const uDoc of usersSnap.docs){
+    const u = uDoc.data();
+    const uid = uDoc.id;
+
+    const recorded = await calcProgress(
+      collection(db,"courses",COURSE_ID,"recorded_classes"), uid
+    );
+    const live = await calcProgress(
+      collection(db,"courses",COURSE_ID,"live_record_classes"), uid
+    );
+    const assign = await calcProgress(
+      collection(db,"courses",COURSE_ID,"assignments"), uid
+    );
+
+    rows.innerHTML += `
       <tr>
         <td>${u.name||"-"}</td>
         <td>${u.email}</td>
-        <td class="${u.paid ? "status-yes" : "status-no"}">
-          ${u.paid ? "Approved" : "Pending"}
+        <td class="${u.paid?"status-yes":"status-no"}">
+          ${u.paid?"Approved":"Pending"}
         </td>
         <td>
+          📘 Recorded ${recorded.percent}%
+          <div class="progress-wrap"><div class="progress-bar" style="width:${recorded.percent}%"></div></div>
+
+          🎥 Live ${live.percent}%
+          <div class="progress-wrap"><div class="progress-bar" style="width:${live.percent}%"></div></div>
+
+          📝 Assignments ${assign.percent}%
+          <div class="progress-wrap"><div class="progress-bar" style="width:${assign.percent}%"></div></div>
+        </td>
+        <td>
+          <button class="view" onclick="viewProgress('${uid}')">View</button>
+          <button class="access" onclick="manageAccess('${uid}')">Access</button>
           ${
             u.paid
-              ? `<button class="revoke" onclick="setPaid('${d.id}',false)">Revoke</button>`
-              : `<button class="approve" onclick="setPaid('${d.id}',true)">Approve</button>`
+              ? `<button class="revoke" onclick="setPaid('${uid}',false)">Revoke</button>`
+              : `<button class="approve" onclick="setPaid('${uid}',true)">Approve</button>`
           }
         </td>
       </tr>
     `;
+  }
+}
+
+/* VIEW PROGRESS */
+window.viewProgress = async uid=>{
+  lessonList.innerHTML="";
+
+  await renderSection("📘 Recorded Classes",
+    collection(db,"courses",COURSE_ID,"recorded_classes"), uid);
+
+  await renderSection("🎥 Live Recorded Classes",
+    collection(db,"courses",COURSE_ID,"live_record_classes"), uid);
+
+  await renderSection("📝 Assignments",
+    collection(db,"courses",COURSE_ID,"assignments"), uid);
+
+  modal.style.display="flex";
+};
+
+async function renderSection(title,colRef,uid){
+  const snap = await getDocs(colRef);
+  let done=0;
+
+  snap.forEach(d=>{
+    if(d.data().completedBy?.includes(uid)) done++;
+  });
+
+  const percent = snap.size ? Math.round(done/snap.size*100) : 0;
+
+  lessonList.innerHTML += `
+    <div class="section">
+      <strong>${title} – ${percent}%</strong>
+      <div class="progress-wrap">
+        <div class="progress-bar" style="width:${percent}%"></div>
+      </div>
+    </div>
+  `;
+
+  snap.forEach(d=>{
+    const ok = d.data().completedBy?.includes(uid);
+    lessonList.innerHTML += `
+      <div class="lesson ${ok?"done":"todo"}">
+        ${ok?"✔":"⏳"} ${d.data().title}
+      </div>
+    `;
   });
 }
 
-/* ---------- UPDATE STATUS ---------- */
-window.setPaid = async (uid,val)=>{
+/* MANAGE ACCESS (NEW) */
+window.manageAccess = async uid=>{
+  currentAccessUser = uid;
+  accessList.innerHTML="";
+
+  await renderAccess("📘 Recorded Classes","recorded_classes");
+  await renderAccess("🎥 Live Recorded Classes","live_record_classes");
+  await renderAccess("📝 Assignments","assignments");
+
+  accessModal.style.display="flex";
+};
+
+async function renderAccess(title, type){
+  const userSnap = await getDoc(doc(db,"users",currentAccessUser));
+  const allowed = userSnap.data().access?.[type] || [];
+
+  const snap = await getDocs(collection(db,"courses",COURSE_ID,type));
+
+  accessList.innerHTML += `<div class="section"><strong>${title}</strong></div>`;
+
+  snap.forEach(d=>{
+    accessList.innerHTML += `
+      <div class="lesson">
+        <input type="checkbox"
+          ${allowed.includes(d.id)?"checked":""}
+          onchange="toggleAccess('${type}','${d.id}',this.checked)">
+        ${d.data().title}
+      </div>
+    `;
+  });
+}
+
+window.toggleAccess = async(type,id,checked)=>{
+  const ref = doc(db,"users",currentAccessUser);
+  const snap = await getDoc(ref);
+  const access = snap.data().access || {};
+  const list = new Set(access[type] || []);
+
+  checked ? list.add(id) : list.delete(id);
+
+  await updateDoc(ref,{[`access.${type}`]:Array.from(list)});
+};
+
+window.closeModal = ()=> modal.style.display="none";
+window.closeAccess = ()=> accessModal.style.display="none";
+
+/* APPROVE / REVOKE */
+window.setPaid = async(uid,val)=>{
   await updateDoc(doc(db,"users",uid),{paid:val});
   loadUsers();
 };
 
-/* ---------- LOGOUT ---------- */
-window.logout = async ()=>{
+/* LOGOUT */
+window.logout = async()=>{
   await signOut(auth);
   location.href="masterclass_login.html";
 };
