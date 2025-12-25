@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Software Downloads – Admin | PT Experts Masterclass</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase shared init -->
+<script type="module" src="firebase-config.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:#f4f7fb;
+}
+
+/* HEADER */
+header{
+  background:#0a1a32;
+  color:#fff;
+  padding:1rem 1.5rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header a{
+  color:#22c55e;
+  text-decoration:none;
+  font-weight:600;
+}
+.logout{
+  cursor:pointer;
+  color:#facc15;
+  font-weight:600;
+}
+
+/* LAYOUT */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:2rem 1.5rem;
+}
+h2{margin-bottom:1rem}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+th,td{
+  padding:.8rem;
+  border-bottom:1px solid #e2e8f0;
+  text-align:left;
+}
+th{
+  background:#f1f5f9;
+  font-weight:700;
+}
+
+/* INPUTS */
+input[type="text"],
+input[type="number"],
+textarea{
+  width:100%;
+  padding:.45rem;
+  font-family:inherit;
+}
+textarea{
+  resize:vertical;
+  min-height:50px;
+}
+
+/* BUTTONS */
+button{
+  padding:.45rem .9rem;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+.save{background:#2563eb;color:#fff}
+.add{background:#16a34a;color:#fff;margin-top:15px}
+
+/* LOADING */
+.loading{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.1rem;
+  color:#64748b;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading" class="loading">Checking admin access…</div>
+
+<div id="panel" style="display:none">
+
+<header>
+  <strong>💾 Software Downloads Manager</strong>
+  <div style="display:flex;gap:15px;align-items:center">
+    <a href="masterclass_admin.html">⬅ Back to Dashboard</a>
+    <a href="masterclass_index.html" target="_blank">👤 Open User Page</a>
+    <span class="logout" onclick="logout()">Logout</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <h2>Software / Files</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description / Version</th>
+        <th>Download URL</th>
+        <th>Order</th>
+        <th>Enabled</th>
+        <th>Locked</th>
+        <th>Save</th>
+      </tr>
+    </thead>
+    <tbody id="downloadRows"></tbody>
+  </table>
+
+  <button class="add" onclick="addNewDownload()">➕ Add Download</button>
+
+</div>
+</div>
+
+<script type="module">
+import { onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const auth = window.auth;
+const db = window.db;
+
+const downloadRef = collection(
+  db,
+  "courses",
+  "masterclass_06_2025",
+  "downloads"
+);
+
+/* ---------- ADMIN CHECK ---------- */
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    location.href="masterclass_login.html";
+    return;
+  }
+
+  const adminSnap = await getDoc(doc(db,"admins",user.uid));
+  if(!adminSnap.exists()){
+    alert("Admin access only");
+    location.href="masterclass_index.html";
+    return;
+  }
+
+  document.getElementById("loading").style.display="none";
+  document.getElementById("panel").style.display="block";
+  loadDownloads();
+});
+
+/* ---------- LOAD DOWNLOADS ---------- */
+async function loadDownloads(){
+  const rows=document.getElementById("downloadRows");
+  rows.innerHTML="";
+
+  const q=query(downloadRef,orderBy("order"));
+  const snap=await getDocs(q);
+
+  snap.forEach(d=>{
+    const f=d.data();
+    rows.innerHTML+=`
+      <tr>
+        <td><input type="text" id="t_${d.id}" value="${f.name||""}"></td>
+        <td><textarea id="d_${d.id}">${f.description||""}</textarea></td>
+        <td><input type="text" id="u_${d.id}" value="${f.url||""}"></td>
+        <td><input type="number" id="o_${d.id}" value="${f.order||1}" style="width:70px"></td>
+        <td><input type="checkbox" id="e_${d.id}" ${f.enabled?"checked":""}></td>
+        <td><input type="checkbox" id="l_${d.id}" ${f.locked?"checked":""}></td>
+        <td><button class="save" onclick="saveDownload('${d.id}')">💾</button></td>
+      </tr>
+    `;
+  });
+}
+
+/* ---------- SAVE DOWNLOAD ---------- */
+window.saveDownload = async (id)=>{
+  await updateDoc(doc(downloadRef,id),{
+    name:document.getElementById(`t_${id}`).value,
+    description:document.getElementById(`d_${id}`).value,
+    url:document.getElementById(`u_${id}`).value,
+    order:Number(document.getElementById(`o_${id}`).value),
+    enabled:document.getElementById(`e_${id}`).checked,
+    locked:document.getElementById(`l_${id}`).checked
+  });
+  alert("Saved");
+  loadDownloads();
+};
+
+/* ---------- ADD DOWNLOAD ---------- */
+window.addNewDownload = async ()=>{
+  const id="download_"+Date.now();
+  await setDoc(doc(downloadRef,id),{
+    name:"New Software",
+    description:"",
+    url:"",
+    order:999,
+    enabled:false,
+    locked:true,
+    createdAt:new Date()
+  });
+  loadDownloads();
+};
+
+/* ---------- LOGOUT ---------- */
+window.logout = async ()=>{
+  await signOut(auth);
+  location.href="masterclass_login.html";
+};
+</script>
+
+</body>
+</html>

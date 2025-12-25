@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Panel – PT Experts Masterclass</title>
+<title>Admin Dashboard – PT Experts Masterclass</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase init (shared) -->
+<!-- Firebase (shared) -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -14,6 +14,8 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:#f4f7fb;
 }
+
+/* HEADER */
 header{
   background:#0a1a32;
   color:#fff;
@@ -22,48 +24,60 @@ header{
   justify-content:space-between;
   align-items:center;
 }
+.logout{
+  cursor:pointer;
+  color:#facc15;
+  font-weight:600;
+}
+
+/* LAYOUT */
 .container{
   max-width:1200px;
   margin:auto;
-  padding:1.5rem;
+  padding:2rem 1.5rem;
 }
-table{
-  width:100%;
-  border-collapse:collapse;
+h2{
+  margin-bottom:1.5rem;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1.2rem;
+}
+.card{
   background:#fff;
-  border-radius:12px;
-  overflow:hidden;
-  margin-top:15px;
-}
-th,td{
-  padding:.8rem;
-  border-bottom:1px solid #e2e8f0;
-  text-align:left;
-}
-th{background:#f1f5f9}
-button{
-  padding:.4rem .8rem;
-  border:none;
-  border-radius:6px;
+  border-radius:16px;
+  padding:1.5rem;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
   cursor:pointer;
-  font-weight:600;
+  transition:.25s ease;
 }
-.approve{background:#22c55e;color:#fff}
-.revoke{background:#ef4444;color:#fff}
-.logout{cursor:pointer;color:#facc15;font-weight:600}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 35px rgba(0,0,0,.12);
+}
+.icon{
+  font-size:1.8rem;
+}
+.card h3{
+  margin:.6rem 0 .3rem;
+}
+.card p{
+  margin:0;
+  color:#64748b;
+  font-size:.9rem;
+}
+
+/* LOADING */
 .loading{
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:1.1rem;
-}
-.section-title{
-  margin-top:40px;
-  font-size:1.3rem;
-}
-input[type="text"], input[type="number"]{
-  width:100%;
+  color:#64748b;
 }
 </style>
 </head>
@@ -75,9 +89,11 @@ input[type="text"], input[type="number"]{
 <div id="panel" style="display:none">
 
 <header>
-  <h3>Masterclass Admin Panel</h3>
+  <strong>Masterclass Admin Dashboard</strong>
   <div style="display:flex;gap:15px;align-items:center">
-    <a href="masterclass_index.html" target="_blank" style="color:#22c55e;font-weight:600;text-decoration:none">
+    <a href="masterclass_index.html"
+       target="_blank"
+       style="color:#22c55e;font-weight:600;text-decoration:none">
       👤 Open User Page
     </a>
     <span class="logout" onclick="logout()">Logout</span>
@@ -86,38 +102,46 @@ input[type="text"], input[type="number"]{
 
 <div class="container">
 
-  <!-- USERS -->
-  <h3 class="section-title">👥 User Access Control</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Paid</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="userRows"></tbody>
-  </table>
+  <h2>Control Panel</h2>
 
-  <!-- VIDEOS -->
-  <h3 class="section-title">📹 Recorded Classes Manager</h3>
+  <div class="grid">
 
-  <table>
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Video URL</th>
-        <th>Order</th>
-        <th>Enabled</th>
-        <th>Locked</th>
-        <th>Save</th>
-      </tr>
-    </thead>
-    <tbody id="videoRows"></tbody>
-  </table>
+    <!-- USERS -->
+    <div class="card" onclick="go('admin_users.html')">
+      <div class="icon">👥</div>
+      <h3>Users</h3>
+      <p>Approve or revoke course access</p>
+    </div>
 
-  <button style="margin-top:15px" onclick="addNewVideo()">➕ Add New Week</button>
+    <!-- RECORDED -->
+    <div class="card" onclick="go('admin_recorded_classes.html')">
+      <div class="icon">📹</div>
+      <h3>Recorded Classes</h3>
+      <p>Manage videos, order & locking</p>
+    </div>
+
+    <!-- LIVE -->
+    <div class="card" onclick="go('admin_live_classes.html')">
+      <div class="icon">🎥</div>
+      <h3>Live Classes</h3>
+      <p>Schedule & manage live sessions</p>
+    </div>
+
+    <!-- ASSIGNMENTS -->
+    <div class="card" onclick="go('admin_assignments.html')">
+      <div class="icon">📝</div>
+      <h3>Assignments</h3>
+      <p>Create & control assignments</p>
+    </div>
+
+    <!-- DOWNLOADS -->
+    <div class="card" onclick="go('admin_downloads.html')">
+      <div class="icon">💾</div>
+      <h3>Software Downloads</h3>
+      <p>Files, tools & resources</p>
+    </div>
+
+  </div>
 
 </div>
 </div>
@@ -125,115 +149,35 @@ input[type="text"], input[type="number"]{
 <script type="module">
 import { onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const auth = window.auth;
 const db = window.db;
 
-const courseRef = collection(
-  db,
-  "courses",
-  "masterclass_06_2025",
-  "recorded_classes"
-);
-
-/* ---------- AUTH CHECK ---------- */
+/* ADMIN CHECK */
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return location.href = "masterclass_login.html";
-
-  const adminSnap = await getDoc(doc(db, "admins", user.uid));
-  if (!adminSnap.exists()) {
-    alert("Admin access only");
-    return location.href = "masterclass_index.html";
+  if (!user) {
+    location.href = "masterclass_login.html";
+    return;
   }
 
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("panel").style.display = "block";
+  const adminSnap = await getDoc(doc(db,"admins",user.uid));
+  if (!adminSnap.exists()) {
+    alert("Admin access only");
+    location.href = "masterclass_index.html";
+    return;
+  }
 
-  loadUsers();
-  loadVideos();
+  document.getElementById("loading").style.display="none";
+  document.getElementById("panel").style.display="block";
 });
 
-/* ---------- USERS ---------- */
-async function loadUsers(){
-  const rows = document.getElementById("userRows");
-  rows.innerHTML = "";
+/* NAV */
+window.go = (page)=> location.href = page;
 
-  const snap = await getDocs(collection(db,"users"));
-  snap.forEach(d=>{
-    const u=d.data();
-    rows.innerHTML+=`
-      <tr>
-        <td>${u.name||"-"}</td>
-        <td>${u.email}</td>
-        <td>${u.paid?"Yes":"No"}</td>
-        <td>
-          ${
-            u.paid
-            ? `<button class="revoke" onclick="setPaid('${d.id}',false)">Revoke</button>`
-            : `<button class="approve" onclick="setPaid('${d.id}',true)">Approve</button>`
-          }
-        </td>
-      </tr>`;
-  });
-}
-
-window.setPaid = async (uid,val)=>{
-  await updateDoc(doc(db,"users",uid),{paid:val});
-  loadUsers();
-};
-
-/* ---------- VIDEOS ---------- */
-async function loadVideos(){
-  const rows=document.getElementById("videoRows");
-  rows.innerHTML="";
-  const snap=await getDocs(courseRef);
-
-  snap.forEach(d=>{
-    const v=d.data();
-    rows.innerHTML+=`
-      <tr>
-        <td><input value="${v.title||""}" id="t_${d.id}"></td>
-        <td><input value="${v.videoUrl||""}" id="u_${d.id}"></td>
-        <td><input type="number" value="${v.order||1}" id="o_${d.id}" style="width:60px"></td>
-        <td><input type="checkbox" ${v.enabled?"checked":""} id="e_${d.id}"></td>
-        <td><input type="checkbox" ${v.locked?"checked":""} id="l_${d.id}"></td>
-        <td><button onclick="saveVideo('${d.id}')">💾</button></td>
-      </tr>`;
-  });
-}
-
-window.saveVideo=async(id)=>{
-  await updateDoc(doc(courseRef,id),{
-    title:document.getElementById(`t_${id}`).value,
-    videoUrl:document.getElementById(`u_${id}`).value,
-    order:Number(document.getElementById(`o_${id}`).value),
-    enabled:document.getElementById(`e_${id}`).checked,
-    locked:document.getElementById(`l_${id}`).checked
-  });
-  alert("Saved");
-};
-
-window.addNewVideo=async()=>{
-  await setDoc(doc(courseRef,"week_"+Date.now()),{
-    title:"New Week",
-    videoUrl:"",
-    order:1,
-    enabled:false,
-    locked:true
-  });
-  loadVideos();
-};
-
-window.logout=async()=>{
+/* LOGOUT */
+window.logout = async ()=>{
   await signOut(auth);
   location.href="masterclass_login.html";
 };

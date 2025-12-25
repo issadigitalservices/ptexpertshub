@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Access – Admin | PT Experts Masterclass</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase (shared init) -->
+<script type="module" src="firebase-config.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:#f4f7fb;
+}
+
+/* HEADER */
+header{
+  background:#0a1a32;
+  color:#fff;
+  padding:1rem 1.5rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header a{
+  color:#22c55e;
+  text-decoration:none;
+  font-weight:600;
+}
+.logout{
+  cursor:pointer;
+  color:#facc15;
+  font-weight:600;
+}
+
+/* LAYOUT */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:2rem 1.5rem;
+}
+h2{
+  margin-bottom:1rem;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+th,td{
+  padding:.9rem;
+  border-bottom:1px solid #e2e8f0;
+  text-align:left;
+}
+th{
+  background:#f1f5f9;
+  font-weight:700;
+}
+.status-yes{
+  color:#16a34a;
+  font-weight:700;
+}
+.status-no{
+  color:#dc2626;
+  font-weight:700;
+}
+
+/* BUTTONS */
+button{
+  padding:.4rem .9rem;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+.approve{
+  background:#22c55e;
+  color:#fff;
+}
+.revoke{
+  background:#ef4444;
+  color:#fff;
+}
+
+/* LOADING */
+.loading{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.1rem;
+  color:#64748b;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading" class="loading">Checking admin access…</div>
+
+<div id="panel" style="display:none">
+
+<header>
+  <strong>User Access Control</strong>
+  <div style="display:flex;gap:15px;align-items:center">
+    <a href="masterclass_admin.html">⬅ Back to Dashboard</a>
+    <a href="masterclass_index.html" target="_blank">👤 Open User Page</a>
+    <span class="logout" onclick="logout()">Logout</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <h2>👥 Course Users</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="userRows"></tbody>
+  </table>
+
+</div>
+</div>
+
+<script type="module">
+import { onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const auth = window.auth;
+const db = window.db;
+
+/* ---------- ADMIN CHECK ---------- */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    location.href = "masterclass_login.html";
+    return;
+  }
+
+  const adminSnap = await getDoc(doc(db,"admins",user.uid));
+  if (!adminSnap.exists()) {
+    alert("Admin access only");
+    location.href = "masterclass_index.html";
+    return;
+  }
+
+  document.getElementById("loading").style.display="none";
+  document.getElementById("panel").style.display="block";
+  loadUsers();
+});
+
+/* ---------- LOAD USERS ---------- */
+async function loadUsers(){
+  const rows=document.getElementById("userRows");
+  rows.innerHTML="";
+
+  const snap=await getDocs(collection(db,"users"));
+
+  snap.forEach(d=>{
+    const u=d.data();
+    rows.innerHTML+=`
+      <tr>
+        <td>${u.name||"-"}</td>
+        <td>${u.email}</td>
+        <td class="${u.paid ? "status-yes" : "status-no"}">
+          ${u.paid ? "Approved" : "Pending"}
+        </td>
+        <td>
+          ${
+            u.paid
+              ? `<button class="revoke" onclick="setPaid('${d.id}',false)">Revoke</button>`
+              : `<button class="approve" onclick="setPaid('${d.id}',true)">Approve</button>`
+          }
+        </td>
+      </tr>
+    `;
+  });
+}
+
+/* ---------- UPDATE STATUS ---------- */
+window.setPaid = async (uid,val)=>{
+  await updateDoc(doc(db,"users",uid),{paid:val});
+  loadUsers();
+};
+
+/* ---------- LOGOUT ---------- */
+window.logout = async ()=>{
+  await signOut(auth);
+  location.href="masterclass_login.html";
+};
+</script>
+
+</body>
+</html>
