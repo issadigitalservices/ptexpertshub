@@ -5,7 +5,6 @@
 <title>Assignments – PT Experts Masterclass</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase (shared init) -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -32,7 +31,6 @@ header a{
   margin:auto;
   padding:1.5rem;
 }
-h2{margin-bottom:1rem}
 .list{
   display:flex;
   flex-direction:column;
@@ -49,9 +47,8 @@ h2{margin-bottom:1rem}
 }
 .card.locked{opacity:.6}
 .card.disabled{opacity:.4}
-.info{
-  max-width:70%;
-}
+.info{max-width:70%}
+
 .badge{
   display:inline-block;
   margin-top:6px;
@@ -63,6 +60,8 @@ h2{margin-bottom:1rem}
 .badge.locked{background:#fde68a;color:#92400e}
 .badge.disabled{background:#e5e7eb;color:#374151}
 .badge.open{background:#dcfce7;color:#166534}
+.badge.done{background:#bbf7d0;color:#166534}
+
 .btn{
   padding:8px 16px;
   border-radius:10px;
@@ -74,6 +73,7 @@ h2{margin-bottom:1rem}
 .btn.open{background:#2563eb;color:#fff}
 .btn.locked{background:#facc15;color:#92400e}
 .btn.disabled{background:#e5e7eb;color:#6b7280}
+
 .loading{
   min-height:70vh;
   display:flex;
@@ -92,21 +92,20 @@ h2{margin-bottom:1rem}
 </header>
 
 <div class="container">
-
   <div id="loading" class="loading">Loading assignments…</div>
   <div id="list" class="list"></div>
-
 </div>
 
 <script type="module">
-import { onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
   collection,
   getDocs,
   doc,
   getDoc,
+  updateDoc,
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -114,17 +113,26 @@ import {
 const auth = window.auth;
 const db = window.db;
 
+const COURSE_ID = "masterclass_06_2025";
+
 const list = document.getElementById("list");
 const loading = document.getElementById("loading");
 
-/* AUTH CHECK */
-onAuthStateChanged(auth, async (user)=>{
-  if (!user) return location.href="masterclass_login.html";
+let currentUserId = null;
+let allowedAssignments = [];
 
-  const snap = await getDoc(doc(db,"users",user.uid));
-  if (!snap.exists() || snap.data().paid!==true) {
+/* AUTH */
+onAuthStateChanged(auth, async (user)=>{
+  if(!user) return location.href="masterclass_login.html";
+
+  currentUserId = user.uid;
+
+  const userSnap = await getDoc(doc(db,"users",user.uid));
+  if(!userSnap.exists() || userSnap.data().paid !== true){
     return location.href="masterclass_login.html";
   }
+
+  allowedAssignments = userSnap.data().access?.assignments || [];
 
   loadAssignments();
 });
@@ -135,30 +143,46 @@ async function loadAssignments(){
   loading.style.display="flex";
 
   const q = query(
-    collection(db,"courses","masterclass_06_2025","assignments"),
+    collection(db,"courses",COURSE_ID,"assignments"),
     orderBy("order","asc")
   );
 
   const snap = await getDocs(q);
 
   snap.forEach(d=>{
-    const a=d.data();
+    const a = d.data();
 
-    let state="open", badge="Available";
-    if (!a.enabled){ state="disabled"; badge="Disabled"; }
-    else if (a.locked){ state="locked"; badge="Locked"; }
+    // access control
+    if (allowedAssignments.length && !allowedAssignments.includes(d.id)) return;
 
-    const card=document.createElement("div");
-    card.className=`card ${state}`;
-    card.innerHTML=`
+    const completed = a.completedBy?.includes(currentUserId);
+
+    let state = "open";
+    let badge = "Available";
+
+    if (!a.enabled) {
+      state = "disabled";
+      badge = "Disabled";
+    } else if (a.locked) {
+      state = "locked";
+      badge = "Locked";
+    } else if (completed) {
+      badge = "Completed";
+    }
+
+    const card = document.createElement("div");
+    card.className = `card ${state}`;
+
+    card.innerHTML = `
       <div class="info">
         <strong>${a.title}</strong>
-        <p style="margin:.3rem 0;color:#475569">${a.description||""}</p>
-        <span class="badge ${state}">${badge}</span>
+        <p style="margin:.3rem 0;color:#475569">${a.description || ""}</p>
+        <span class="badge ${completed ? "done" : state}">${badge}</span>
       </div>
       ${
-        state==="open"
-        ? `<a class="btn open" href="${a.assignmentUrl}" target="_blank">Open</a>`
+        state === "open"
+        ? `<a class="btn open" href="${a.submitUrl}" target="_blank"
+             onclick="markDone('${d.id}')">Open</a>`
         : `<span class="btn ${state}">🔒</span>`
       }
     `;
@@ -168,6 +192,19 @@ async function loadAssignments(){
 
   loading.style.display="none";
 }
+
+/* MARK COMPLETED */
+window.markDone = async (id)=>{
+  const ref = doc(db,"courses",COURSE_ID,"assignments",id);
+  const snap = await getDoc(ref);
+  const done = snap.data().completedBy || [];
+
+  if(!done.includes(currentUserId)){
+    await updateDoc(ref,{
+      completedBy: [...done, currentUserId]
+    });
+  }
+};
 </script>
 
 </body>

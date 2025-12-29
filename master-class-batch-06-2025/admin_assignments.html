@@ -5,7 +5,6 @@
 <title>Assignments – Admin | PT Experts Masterclass</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase shared init -->
 <script type="module" src="firebase-config.js"></script>
 
 <style>
@@ -29,11 +28,7 @@ header a{
   text-decoration:none;
   font-weight:600;
 }
-.logout{
-  cursor:pointer;
-  color:#facc15;
-  font-weight:600;
-}
+.logout{cursor:pointer;color:#facc15;font-weight:600}
 
 /* LAYOUT */
 .container{
@@ -41,7 +36,6 @@ header a{
   margin:auto;
   padding:2rem 1.5rem;
 }
-h2{margin-bottom:1rem}
 
 /* TABLE */
 table{
@@ -122,7 +116,7 @@ button{
       <tr>
         <th>Title</th>
         <th>Description</th>
-        <th>Submission URL</th>
+        <th>Google Drive URL</th>
         <th>Order</th>
         <th>Enabled</th>
         <th>Locked</th>
@@ -162,7 +156,7 @@ const assignmentRef = collection(
   "assignments"
 );
 
-/* ---------- ADMIN CHECK ---------- */
+/* ADMIN CHECK */
 onAuthStateChanged(auth, async (user)=>{
   if(!user){
     location.href="masterclass_login.html";
@@ -181,7 +175,16 @@ onAuthStateChanged(auth, async (user)=>{
   loadAssignments();
 });
 
-/* ---------- LOAD ASSIGNMENTS ---------- */
+/* GOOGLE DRIVE VALIDATION */
+function isGoogleDriveUrl(url){
+  return (
+    url.includes("drive.google.com/file/") ||
+    url.includes("drive.google.com/open") ||
+    url.includes("drive.google.com/drive/")
+  );
+}
+
+/* LOAD */
 async function loadAssignments(){
   const rows=document.getElementById("assignmentRows");
   rows.innerHTML="";
@@ -199,30 +202,39 @@ async function loadAssignments(){
         <td><input type="number" id="o_${d.id}" value="${a.order||1}" style="width:70px"></td>
         <td><input type="checkbox" id="e_${d.id}" ${a.enabled?"checked":""}></td>
         <td><input type="checkbox" id="l_${d.id}" ${a.locked?"checked":""}></td>
-        <td><button class="save" onclick="saveAssignment('${d.id}')">💾</button></td>
+        <td>
+          <button class="save" onclick="saveAssignment('${d.id}')">💾</button>
+        </td>
       </tr>
     `;
   });
 }
 
-/* ---------- SAVE ASSIGNMENT ---------- */
+/* SAVE */
 window.saveAssignment = async (id)=>{
+  const url = document.getElementById(`u_${id}`).value.trim();
+
+  if(url && !isGoogleDriveUrl(url)){
+    alert("Only Google Drive links are allowed.");
+    return;
+  }
+
   await updateDoc(doc(assignmentRef,id),{
     title:document.getElementById(`t_${id}`).value,
     description:document.getElementById(`d_${id}`).value,
-    submitUrl:document.getElementById(`u_${id}`).value,
+    submitUrl:url,
     order:Number(document.getElementById(`o_${id}`).value),
     enabled:document.getElementById(`e_${id}`).checked,
     locked:document.getElementById(`l_${id}`).checked
   });
-  alert("Saved");
+
+  alert("Saved successfully");
   loadAssignments();
 };
 
-/* ---------- ADD ASSIGNMENT ---------- */
+/* ADD */
 window.addNewAssignment = async ()=>{
-  const id="assignment_"+Date.now();
-  await setDoc(doc(assignmentRef,id),{
+  await setDoc(doc(assignmentRef,"assignment_"+Date.now()),{
     title:"New Assignment",
     description:"",
     submitUrl:"",
@@ -234,7 +246,7 @@ window.addNewAssignment = async ()=>{
   loadAssignments();
 };
 
-/* ---------- LOGOUT ---------- */
+/* LOGOUT */
 window.logout = async ()=>{
   await signOut(auth);
   location.href="masterclass_login.html";

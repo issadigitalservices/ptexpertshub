@@ -2,147 +2,176 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Live Record Classes – Admin</title>
+<title>Live Recorded Classes – Admin | PT Experts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script type="module" src="firebase-config.js"></script>
 
 <style>
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto;background:#f4f7fb}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:#f4f7fb;
+}
 header{
-  background:#0a1a32;color:#fff;
+  background:#0a1a32;
+  color:#fff;
   padding:1rem 1.5rem;
-  display:flex;justify-content:space-between;align-items:center
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
-header a{color:#22c55e;font-weight:600;text-decoration:none}
+header a{color:#22c55e;text-decoration:none;font-weight:600}
 .logout{cursor:pointer;color:#facc15;font-weight:600}
-.container{max-width:1200px;margin:auto;padding:2rem 1.5rem}
-h2{margin-bottom:1rem}
 
-.form{
-  background:#fff;padding:1.5rem;border-radius:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-  margin-bottom:2rem
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:2rem 1.5rem;
 }
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:1rem
+
+.add-top{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:15px;
 }
-input,select,button{
-  padding:.65rem .8rem;border-radius:10px;
-  border:1px solid #e2e8f0;font-size:.95rem
+.add{
+  background:#16a34a;
+  color:#fff;
+  padding:.6rem 1.2rem;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
 }
-button{background:#0a1a32;color:#fff;border:none;cursor:pointer}
-button:hover{opacity:.9}
 
 table{
-  width:100%;border-collapse:collapse;background:#fff;
-  border-radius:16px;overflow:hidden;
-  box-shadow:0 10px 25px rgba(0,0,0,.08)
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
 }
-th,td{padding:.75rem;border-bottom:1px solid #e2e8f0;text-align:left}
-th{background:#f1f5f9;font-size:.9rem}
+th,td{
+  padding:.8rem;
+  border-bottom:1px solid #e2e8f0;
+}
+th{background:#f1f5f9}
 
-.action{cursor:pointer;font-weight:600;margin-right:10px}
-.view{color:#16a34a}
-.edit{color:#2563eb}
-.lock{color:#ca8a04}
-.delete{color:#dc2626}
+input[type="text"],input[type="number"]{
+  width:100%;
+  padding:.45rem;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+}
+
+button{
+  padding:.45rem .9rem;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+.save{background:#2563eb;color:#fff}
+.edit{background:#f59e0b;color:#fff}
+.delete{background:#ef4444;color:#fff}
+
+.loading{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#64748b;
+}
 </style>
 </head>
 
 <body>
 
+<div id="loading" class="loading">Checking admin access…</div>
+
+<div id="panel" style="display:none">
+
 <header>
-  <strong>Live Record Classes – Admin</strong>
-  <div>
+  <strong>📹 Live Recorded Classes Manager</strong>
+  <div style="display:flex;gap:15px;align-items:center">
     <a href="masterclass_admin.html">⬅ Dashboard</a>
+    <a href="masterclass_index.html" target="_blank">👤 User Page</a>
     <span class="logout" onclick="logout()">Logout</span>
   </div>
 </header>
 
 <div class="container">
 
-<h2 id="formTitle">Add Live Record Class</h2>
-
-<div class="form">
-  <div class="form-grid">
-    <input id="title" placeholder="Class Title">
-    <input id="videoUrl" placeholder="Paste ONLY YouTube video URL">
-    <input id="order" type="number" placeholder="Display Order">
-    <select id="locked">
-      <option value="true">Locked (Paid)</option>
-      <option value="false">Unlocked</option>
-    </select>
-    <button onclick="saveRecord()">Save Class</button>
+  <div class="add-top">
+    <button class="add" onclick="addNew()">➕ Add New Video</button>
   </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>YouTube Video URL</th>
+        <th>Order</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="videoRows"></tbody>
+  </table>
+
 </div>
-
-<h2>Live Recorded Classes</h2>
-
-<table>
-<thead>
-<tr>
-  <th>Order</th>
-  <th>Title</th>
-  <th>Locked</th>
-  <th>Actions</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
-</table>
-
 </div>
 
 <script type="module">
 import { onAuthStateChanged, signOut }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 import {
-  collection, addDoc, getDocs, deleteDoc, doc,
-  updateDoc, orderBy, query
+  collection, getDocs, doc, getDoc,
+  setDoc, updateDoc, deleteDoc,
+  query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const auth = window.auth;
 const db = window.db;
+
+// 🔥 SAME STRUCTURE AS RECORDED
 const COURSE_ID = "masterclass_batch_06_2025";
-const colRef = collection(db,"courses",COURSE_ID,"live_record_classes");
+const courseRef = collection(db,"courses",COURSE_ID,"live_recorded_classes");
 
-const titleInput = document.getElementById("title");
-const videoUrlInput = document.getElementById("videoUrl");
-const orderInput = document.getElementById("order");
-const lockedInput = document.getElementById("locked");
-const body = document.getElementById("tableBody");
-const formTitle = document.getElementById("formTitle");
+/* AUTH */
+onAuthStateChanged(auth, async user=>{
+  if(!user) return location.href="masterclass_login.html";
 
-let editId = null;
+  const adminSnap = await getDoc(doc(db,"admins",user.uid));
+  if(!adminSnap.exists()){
+    alert("Admin access only");
+    return location.href="masterclass_index.html";
+  }
 
-/* ADMIN CHECK */
-onAuthStateChanged(auth,(u)=>{
-  if(!u) location.href="masterclass_login.html";
+  document.getElementById("loading").style.display="none";
+  document.getElementById("panel").style.display="block";
+  loadVideos();
 });
 
-/* ===== ONLY YOUTUBE VIDEO PARSER (NO PLAYLIST) ===== */
-function parseYouTubeVideo(raw){
+/* YOUTUBE PARSER */
+function parseVideo(raw){
   try{
+    if(raw.includes("list=")) return null;
     const u = new URL(raw);
 
-    // ❌ Block playlist
-    if(u.searchParams.get("list")){
-      alert("Playlist links are not allowed. Please paste a single YouTube video link.");
-      return null;
-    }
-
-    // Normal watch URL
-    const v = u.searchParams.get("v");
-    if(v){
+    if(u.searchParams.get("v")){
+      const id = u.searchParams.get("v");
       return {
-        embed:`https://www.youtube.com/embed/${v}`,
-        view:`https://www.youtube.com/watch?v=${v}`
+        embed:`https://www.youtube.com/embed/${id}`,
+        view:`https://www.youtube.com/watch?v=${id}`
       };
     }
 
-    // Short youtu.be URL
     if(u.hostname.includes("youtu.be")){
       const id = u.pathname.replace("/","");
       return {
@@ -151,100 +180,91 @@ function parseYouTubeVideo(raw){
       };
     }
   }catch(e){}
-
-  alert("Invalid YouTube video URL");
   return null;
 }
 
-/* LOAD DATA */
-async function loadData(){
-  body.innerHTML="";
-  const snap = await getDocs(query(colRef,orderBy("order","asc")));
-  snap.forEach(d=>{
-    const x = d.data();
-    body.innerHTML+=`
+/* LOAD */
+async function loadVideos(){
+  const rows = document.getElementById("videoRows");
+  rows.innerHTML="";
+
+  const snap = await getDocs(query(courseRef, orderBy("order","asc")));
+
+  if(snap.empty){
+    rows.innerHTML = `
       <tr>
-        <td>${x.order}</td>
-        <td>${x.title}</td>
-        <td>${x.locked?"Yes":"No"}</td>
-        <td>
-          <span class="action view" onclick="viewRec('${x.viewUrl}')">View</span>
-          <span class="action edit"
-            onclick="editRec('${d.id}','${x.title}','${x.viewUrl}',${x.order},${x.locked})">Edit</span>
-          <span class="action lock"
-            onclick="toggleLock('${d.id}',${x.locked})">
-            ${x.locked?"Unlock":"Lock"}
-          </span>
-          <span class="action delete" onclick="delRec('${d.id}')">Delete</span>
+        <td colspan="4" style="text-align:center;color:#64748b">
+          No live recorded classes added yet.
+        </td>
+      </tr>`;
+    return;
+  }
+
+  snap.forEach(d=>{
+    const v=d.data();
+    rows.innerHTML += `
+      <tr>
+        <td><input id="t_${d.id}" value="${v.title||""}" disabled></td>
+        <td><input id="u_${d.id}" value="${v.viewUrl||""}" disabled></td>
+        <td><input type="number" id="o_${d.id}" value="${v.order||1}" disabled></td>
+        <td class="actions">
+          <button class="edit" onclick="enableEdit('${d.id}')">✏</button>
+          <button class="save" onclick="save('${d.id}')">💾</button>
+          <button class="delete" onclick="del('${d.id}')">🗑</button>
         </td>
       </tr>`;
   });
 }
-loadData();
 
-/* SAVE (ADD / UPDATE) */
-window.saveRecord = async ()=>{
-  const title = titleInput.value.trim();
-  const raw = videoUrlInput.value.trim();
-  const order = Number(orderInput.value);
-  const locked = lockedInput.value==="true";
+/* ENABLE EDIT */
+window.enableEdit = id=>{
+  ["t_","u_","o_"].forEach(p=>{
+    document.getElementById(p+id).disabled=false;
+  });
+};
 
-  const parsed = parseYouTubeVideo(raw);
-  if(!title || !parsed || !order) return;
+/* SAVE */
+window.save = async id=>{
+  const raw = document.getElementById(`u_${id}`).value.trim();
+  const parsed = parseVideo(raw);
 
-  if(editId){
-    await updateDoc(
-      doc(db,"courses",COURSE_ID,"live_record_classes",editId),
-      {title,videoUrl:parsed.embed,viewUrl:parsed.view,order,locked}
-    );
-    editId=null;
-    formTitle.textContent="Add Live Record Class";
-  }else{
-    await addDoc(colRef,{
-      title,
-      videoUrl:parsed.embed,
-      viewUrl:parsed.view,
-      order,
-      locked,
-      createdAt:Date.now()
-    });
+  if(!parsed){
+    alert("Please enter a valid YouTube video URL.");
+    return;
   }
 
-  titleInput.value="";
-  videoUrlInput.value="";
-  orderInput.value="";
-  lockedInput.value="true";
-  loadData();
+  await updateDoc(doc(courseRef,id),{
+    title:document.getElementById(`t_${id}`).value,
+    videoUrl:parsed.embed,
+    viewUrl:parsed.view,
+    order:Number(document.getElementById(`o_${id}`).value)
+  });
+
+  loadVideos();
 };
 
-/* ACTIONS */
-window.viewRec = (url)=> window.open(url,"_blank");
-
-window.editRec = (id,t,url,o,l)=>{
-  editId=id;
-  formTitle.textContent="Edit Live Record Class";
-  titleInput.value=t;
-  videoUrlInput.value=url;
-  orderInput.value=o;
-  lockedInput.value=l?"true":"false";
-};
-
-window.toggleLock = async(id,current)=>{
-  await updateDoc(
-    doc(db,"courses",COURSE_ID,"live_record_classes",id),
-    {locked:!current}
-  );
-  loadData();
-};
-
-window.delRec = async(id)=>{
-  if(confirm("Delete this class?")){
-    await deleteDoc(doc(db,"courses",COURSE_ID,"live_record_classes",id));
-    loadData();
+/* DELETE */
+window.del = async id=>{
+  if(confirm("Delete this video?")){
+    await deleteDoc(doc(courseRef,id));
+    loadVideos();
   }
 };
 
-window.logout = async()=>{
+/* ADD */
+window.addNew = async ()=>{
+  await setDoc(doc(courseRef,"vid_"+Date.now()),{
+    title:"New Video",
+    videoUrl:"",
+    viewUrl:"",
+    order:999,
+    createdAt:new Date()
+  });
+  loadVideos();
+};
+
+/* LOGOUT */
+window.logout = async ()=>{
   await signOut(auth);
   location.href="masterclass_login.html";
 };

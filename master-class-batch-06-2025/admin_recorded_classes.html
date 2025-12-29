@@ -257,12 +257,18 @@ window.del = async id=>{
 /* ADD NEW */
 window.addNew = async ()=>{
   await setDoc(doc(courseRef,"vid_"+Date.now()),{
-    title:"New Video",
-    videoUrl:"",
-    viewUrl:"",
-    order:999,
-    createdAt:new Date()
-  });
+  title: "New Video",
+  videoUrl: "",
+  viewUrl: "",
+  order: 999,
+
+  enabled: true,
+  locked: false,
+  completedBy: [],
+
+  createdAt: new Date()
+});
+
   loadVideos();
 };
 
