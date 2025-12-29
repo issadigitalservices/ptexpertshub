@@ -90,6 +90,22 @@ h2{
   color:#64748b;
 }
 .hidden{display:none}
+
+/* Syllabus image section */
+.syllabus-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0 40px;
+}
+
+.syllabus-image {
+  max-width: 420px;
+  width: 100%;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+}
+
+
 </style>
 </head>
 
@@ -115,38 +131,46 @@ h2{
   <h2>Welcome to the Masterclass</h2>
   <p class="subtitle">You now have full access to the course materials.</p>
 
+  <!-- SYLLABUS IMAGE (TOP CENTER) -->
+  <div class="syllabus-wrapper">
+    <img
+      src="../assets/module.jpg"
+      alt="Course Syllabus"
+      class="syllabus-image"
+    >
+  </div>
+
+  <!-- GRID CARDS -->
   <div class="grid">
 
-  <div class="card" onclick="location.href='recorded_classes.html'">
-    <h3>📹 Recorded Classes</h3>
-    <p>Watch week-wise recorded sessions</p>
-  </div>
+    <div class="card" onclick="location.href='recorded_classes.html'">
+      <h3>📹 Recorded Classes</h3>
+      <p>Watch week-wise recorded sessions</p>
+    </div>
 
-  <!-- ✅ NEW LIVE RECORD CLASSES -->
-  <div class="card" onclick="location.href='live_records.html'">
-    <h3>📡 Live Recorded Classes</h3>
-    <p>Watch recorded live training sessions</p>
-  </div>
+    <div class="card" onclick="location.href='live_records.html'">
+      <h3>📡 Live Recorded Classes</h3>
+      <p>Watch recorded live training sessions</p>
+    </div>
 
-  <div class="card" onclick="location.href='course_materials.html'">
-    <h3>📂 Course Materials</h3>
-    <p>PDF notes, reference files</p>
-  </div>
+    <div class="card" onclick="location.href='course_materials.html'">
+      <h3>📂 Course Materials</h3>
+      <p>PDF notes, reference files</p>
+    </div>
 
-  <div class="card" onclick="location.href='assignments.html'">
-    <h3>📝 Assignments</h3>
-    <p>Practice tasks & submissions</p>
-  </div>
+    <div class="card" onclick="location.href='assignments.html'">
+      <h3>📝 Assignments</h3>
+      <p>Practice tasks & submissions</p>
+    </div>
 
-  <div class="card" onclick="location.href='downloads.html'">
-    <h3>⬇️ Software Downloads</h3>
-    <p>Required tools & sample files</p>
-  </div>
+    <div class="card" onclick="location.href='downloads.html'">
+      <h3>⬇️ Software Downloads</h3>
+      <p>Required tools & sample files</p>
+    </div>
 
+  </div>
 </div>
 
-</div>
-</div>
 
 <script type="module">
 import { onAuthStateChanged, signOut }
