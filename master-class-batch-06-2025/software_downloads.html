@@ -132,7 +132,7 @@ onAuthStateChanged(auth, async (user)=>{
     return location.href="masterclass_login.html";
   }
 
-  allowedSoftwareDownloads = userSnap.data().access?.softwaredownloads || [];
+  allowedSoftwareDownloads = userSnap.data().access?.software_downloads || [];
 
   loadSoftwareDownloads();
 });
@@ -156,19 +156,9 @@ async function loadSoftwareDownloads(){
     if (allowedSoftwareDownloads.length && !allowedSoftwareDownloads.includes(d.id)) return;
 
     const completed = a.completedBy?.includes(currentUserId);
-
+    
     let state = "open";
-    let badge = "Available";
-
-    if (!a.enabled) {
-      state = "disabled";
-      badge = "Disabled";
-    } else if (a.locked) {
-      state = "locked";
-      badge = "Locked";
-    } else if (completed) {
-      badge = "Completed";
-    }
+let badge = completed ? "Completed" : "Available";
 
     const card = document.createElement("div");
     card.className = `card ${state}`;
@@ -195,7 +185,7 @@ async function loadSoftwareDownloads(){
 
 /* MARK COMPLETED */
 window.markDone = async (id)=>{
-  const ref = doc(db,"courses",COURSE_ID,"softwaredownloads",id);
+  const ref = doc(db,"courses",COURSE_ID,"software_downloads",id);
   const snap = await getDoc(ref);
   const done = snap.data().completedBy || [];
 
