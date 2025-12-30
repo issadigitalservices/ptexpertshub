@@ -171,6 +171,8 @@ const COURSE_ID = "masterclass_batch_06_2025";
 let cachedRecorded = [];
 let cachedLive = [];
 let cachedAssign = [];
+let cachedCourseMaterials = [];
+let cachedSoftwareDownloads = [];
 
 let currentAccessUser = null;
 
@@ -193,15 +195,19 @@ onAuthStateChanged(auth, async user=>{
 
 /* PRELOAD ALL LESSONS ONCE (🚀 SPEED FIX) */
 async function preloadLessons(){
-  const [r,l,a] = await Promise.all([
+  const [r,l,a,c,s] = await Promise.all([
     getDocs(collection(db,"courses",COURSE_ID,"recorded_classes")),
     getDocs(collection(db,"courses",COURSE_ID,"live_recorded_classes")),
-    getDocs(collection(db,"courses",COURSE_ID,"assignments"))
+    getDocs(collection(db,"courses",COURSE_ID,"assignments")),
+    getDocs(collection(db,"courses",COURSE_ID,"course_materials")),
+    getDocs(collection(db,"courses",COURSE_ID,"software_downloads"))
   ]);
 
   cachedRecorded = r.docs;
   cachedLive = l.docs;
   cachedAssign = a.docs;
+  cachedCourseMaterials = c.docs;
+  cachedSoftwareDownloads = s.docs;
 }
 
 /* LOAD USERS */
@@ -218,6 +224,8 @@ async function loadUsers(){
     const rec = calcProgress(cachedRecorded, uid);
     const live = calcProgress(cachedLive, uid);
     const ass = calcProgress(cachedAssign, uid);
+    const coursematerials = calcProgress(cachedCourseMaterials, uid);
+    const softwaredownloads = calcProgress(cachedSoftwareDownloads, uid);
 
     rows.innerHTML += `
       <tr>
@@ -235,6 +243,12 @@ async function loadUsers(){
 
           📝 Assignments ${ass.percent}%
           <div class="progress-wrap"><div class="progress-bar" style="width:${ass.percent}%"></div></div>
+
+          📝 CourseMaterials ${coursematerials.percent}%
+          <div class="progress-wrap"><div class="progress-bar" style="width:${coursematerials.percent}%"></div></div>
+
+          📝 SoftwareDownloads ${softwaredownloads.percent}%
+          <div class="progress-wrap"><div class="progress-bar" style="width:${softwaredownloads.percent}%"></div></div>
         </td>
         <td>
           <button class="view" onclick="viewProgress('${uid}')">View</button>
@@ -270,6 +284,8 @@ window.viewProgress = async uid=>{
   renderSection("📘 Recorded Classes", cachedRecorded, uid);
   renderSection("🎥 Live Recorded Classes", cachedLive, uid);
   renderSection("📝 Assignments", cachedAssign, uid);
+  renderSection("📝 CourseMaterials", cachedCourseMaterials, uid);
+  renderSection("📝 SoftwareDownloads", cachedSoftwareDownloads, uid);
 
   modal.style.display="flex";
 };
@@ -310,6 +326,8 @@ window.manageAccess = async uid=>{
   renderAccess("📘 Recorded Classes","recorded_classes",cachedRecorded,access);
   renderAccess("🎥 Live Recorded Classes","live_recorded_classes",cachedLive,access);
   renderAccess("📝 Assignments","assignments",cachedAssign,access);
+  renderAccess("📝 Course Materials","course_materials",cachedCourseMaterials,access);
+  renderAccess("📝 Software Downloads","software_downloads",cachedSoftwareDownloads,access);
 
   accessModal.style.display="flex";
 };
