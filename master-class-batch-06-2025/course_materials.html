@@ -132,7 +132,7 @@ onAuthStateChanged(auth, async (user)=>{
     return location.href="masterclass_login.html";
   }
 
-  allowedCourseMaterials = userSnap.data().access?.coursematerials || [];
+  allowedCourseMaterials = userSnap.data().access?.course_materials || [];
 
   loadCourseMaterials();
 });
@@ -152,23 +152,17 @@ async function loadCourseMaterials(){
   snap.forEach(d=>{
     const a = d.data();
 
-    // access control
-    if (allowedCourseMaterials.length && !allowedCourseMaterials.includes(d.id)) return;
+ // STRICT ID-BASED ACCESS CONTROL (CORRECT)
+if (!Array.isArray(allowedCourseMaterials) || 
+    !allowedCourseMaterials.includes(d.id)) {
+  return;
+}
 
     const completed = a.completedBy?.includes(currentUserId);
 
     let state = "open";
-    let badge = "Available";
+let badge = completed ? "Completed" : "Available";
 
-    if (!a.enabled) {
-      state = "disabled";
-      badge = "Disabled";
-    } else if (a.locked) {
-      state = "locked";
-      badge = "Locked";
-    } else if (completed) {
-      badge = "Completed";
-    }
 
     const card = document.createElement("div");
     card.className = `card ${state}`;
@@ -179,12 +173,8 @@ async function loadCourseMaterials(){
         <p style="margin:.3rem 0;color:#475569">${a.description || ""}</p>
         <span class="badge ${completed ? "done" : state}">${badge}</span>
       </div>
-      ${
-        state === "open"
-        ? `<a class="btn open" href="${a.submitUrl}" target="_blank"
-             onclick="markDone('${d.id}')">Open</a>`
-        : `<span class="btn ${state}">🔒</span>`
-      }
+      <a class="btn open" href="${a.submitUrl}" target="_blank"
+   onclick="markDone('${d.id}')">Open</a>
     `;
 
     list.appendChild(card);
@@ -195,7 +185,7 @@ async function loadCourseMaterials(){
 
 /* MARK COMPLETED */
 window.markDone = async (id)=>{
-  const ref = doc(db,"courses",COURSE_ID,"coursematerials",id);
+  const ref = doc(db,"courses",COURSE_ID,"course_materials",id);
   const snap = await getDoc(ref);
   const done = snap.data().completedBy || [];
 
