@@ -122,10 +122,12 @@ h2{
 <header>
   <span>PT Experts – Masterclass</span>
   <div>
+    <div id="userEmail" style="font-size:13px;color:#cbd5e1;"></div>
     <a id="adminBtn" href="masterclass_admin.html" style="display:none">Admin Panel</a>
     <span class="logout" onclick="logout()">Logout</span>
   </div>
 </header>
+
 
 <div class="container">
   <h2>Welcome to the Masterclass</h2>
@@ -199,6 +201,8 @@ onAuthStateChanged(auth, async (user) => {
   // SHOW CONTENT
   document.getElementById("loading").style.display = "none";
   document.getElementById("content").classList.remove("hidden");
+  document.getElementById("userEmail").textContent = user.email;
+
 
   // ADMIN CHECK
   const adminSnap = await getDoc(doc(db, "admins", user.uid));
