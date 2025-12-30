@@ -156,19 +156,9 @@ async function loadAssignments(){
     if (allowedAssignments.length && !allowedAssignments.includes(d.id)) return;
 
     const completed = a.completedBy?.includes(currentUserId);
-
+    
     let state = "open";
-    let badge = "Available";
-
-    if (!a.enabled) {
-      state = "disabled";
-      badge = "Disabled";
-    } else if (a.locked) {
-      state = "locked";
-      badge = "Locked";
-    } else if (completed) {
-      badge = "Completed";
-    }
+let badge = completed ? "Completed" : "Available";
 
     const card = document.createElement("div");
     card.className = `card ${state}`;
