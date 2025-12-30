@@ -120,7 +120,7 @@ const loading=document.getElementById("loading");
 const progress=document.getElementById("progress");
 const finishBtn=document.getElementById("finishBtn");
 
-/* AUTH */
+/* AUTH */  
 onAuthStateChanged(auth, async user=>{
   if(!user) return location.href="masterclass_login.html";
   currentUserId=user.uid;
