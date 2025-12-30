@@ -78,6 +78,8 @@ button{
   font-weight:700;
 }
 .save{background:#2563eb;color:#fff}
+.edit{background:#f59e0b;color:#fff}
+.delete{background:#ef4444;color:#fff}
 .add{background:#16a34a;color:#fff;margin-top:15px}
 
 /* LOADING */
@@ -88,6 +90,11 @@ button{
   justify-content:center;
   font-size:1.1rem;
   color:#64748b;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
 }
 </style>
 </head>
@@ -118,7 +125,7 @@ button{
         <th>Description</th>
         <th>Google Drive URL</th>
         <th>Order</th>
-        <th>Save</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody id="assignmentRows"></tbody>
@@ -140,6 +147,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -194,17 +202,26 @@ async function loadAssignments(){
     const a=d.data();
     rows.innerHTML+=`
       <tr>
-        <td><input type="text" id="t_${d.id}" value="${a.title||""}"></td>
-        <td><textarea id="d_${d.id}">${a.description||""}</textarea></td>
-        <td><input type="text" id="u_${d.id}" value="${a.submitUrl||""}"></td>
-        <td><input type="number" id="o_${d.id}" value="${a.order||1}" style="width:70px"></td>
-        <td>
-          <button class="save" onclick="saveAssignment('${d.id}')">💾</button>
-        </td>
-      </tr>
+  <td><input type="text" id="t_${d.id}" value="${a.title||""}" disabled></td>
+  <td><textarea id="d_${d.id}">${a.description||""}</textarea></td>
+  <td><input type="text" id="u_${d.id}" value="${a.submitUrl||""}"></td>
+  <td><input type="number" id="o_${d.id}" value="${a.order||1}" style="width:70px"></td>
+  <td class="actions">
+    <button class="edit" onclick="enableEdit('${d.id}')">✏</button>
+    <button class="save" onclick="saveAssignment('${d.id}')">💾</button>
+    <button class="delete" onclick="del('${d.id}')">🗑</button>
+  </td>
+</tr>
     `;
   });
 }
+
+/* ENABLE EDIT */
+window.enableEdit = id=>{
+  ["t_","u_","o_"].forEach(p=>{
+    document.getElementById(p+id).disabled=false;
+  });
+};
 
 /* SAVE */
 window.saveAssignment = async (id)=>{
@@ -224,6 +241,14 @@ window.saveAssignment = async (id)=>{
 
   alert("Saved successfully");
   loadAssignments();
+};
+
+/* DELETE */
+window.del = async id=>{
+  if(confirm("Delete this assignment?")){
+    await deleteDoc(doc(assignmentRef, id));
+    loadCourseMaterials();
+  }
 };
 
 /* ADD */
