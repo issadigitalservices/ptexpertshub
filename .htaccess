@@ -1,0 +1,4 @@
+RewriteEngine On
+
+# /login → login.html
+RewriteRule ^login/?$ /login.html [L]
