@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>Live Recorded Classes – PT Experts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+import { arrayUnion } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 <script type="module" src="firebase-config.js"></script>
 
@@ -137,8 +140,8 @@ onAuthStateChanged(auth, async user=>{
 
 /* LOAD VIDEOS */
 async function loadVideos(){
-  list.innerHTML = "";
-  loading.style.display = "flex";
+  list.innerHTML="";
+  loading.style.display="flex";
 
   const q = query(
     collection(db,"courses",COURSE_ID,"live_recorded_classes"),
@@ -147,45 +150,33 @@ async function loadVideos(){
 
   const snap = await getDocs(q);
 
-  // STEP 1: build allowed list in order
-  const allowedList = [];
-
+  // STEP 1: filter only allowed videos
+  const videos = [];
   snap.forEach(d=>{
-    if (
-      Array.isArray(allowedVideos) &&
-      allowedVideos.includes(d.id)
-    ) {
-      allowedList.push({
-        id: d.id,
-        ...d.data()
-      });
+    if (!allowedVideos || allowedVideos.includes(d.id)) {
+      videos.push({ id: d.id, ...d.data() });
     }
   });
 
   let completedCount = 0;
-  let unlockIndex = -1;
+  let firstIncompleteIndex = -1;
 
-  // STEP 2: find first NOT completed video
-  allowedList.forEach((v, index)=>{
-    if (v.completedBy?.includes(currentUserId)) {
-      completedCount++;
-    } else if (unlockIndex === -1) {
-      unlockIndex = index;
+  // STEP 2: find first incomplete video
+  videos.forEach((v, i)=>{
+    const done = v.completedBy?.includes(currentUserId);
+    if (done) completedCount++;
+    if (!done && firstIncompleteIndex === -1) {
+      firstIncompleteIndex = i;
     }
   });
 
-  // If all completed, nothing to unlock
-  if (unlockIndex === -1) unlockIndex = allowedList.length;
-
   // STEP 3: render videos
-  allowedList.forEach((v, index)=>{
-    let state = "locked";
+  videos.forEach((v, i)=>{
+    const done = v.completedBy?.includes(currentUserId);
 
-    if (v.completedBy?.includes(currentUserId)) {
-      state = "completed";
-    } else if (index === unlockIndex) {
-      state = "available";
-    }
+    let state = "locked";
+    if (done) state = "completed";
+    else if (i === firstIncompleteIndex) state = "available";
 
     const row = document.createElement("div");
     row.className = `item ${state === "locked" ? "locked" : ""}`;
@@ -194,58 +185,40 @@ async function loadVideos(){
       <div>
         <strong>${v.title}</strong><br>
         <span class="badge ${state}">
-          ${
-            state === "completed"
-              ? "Completed"
-              : state === "available"
-              ? "Available"
-              : "Locked"
-          }
+          ${state === "completed" ? "Completed" : state === "available" ? "Available" : "Locked"}
         </span>
       </div>
-      <button class="play ${
-        state === "completed"
-          ? "rewatch"
-          : state === "available"
-          ? "play"
-          : "locked"
-      }">
-        ${
-          state === "completed"
-            ? "Rewatch"
-            : state === "available"
-            ? "Play"
-            : "🔒"
-        }
+      <button class="play ${state === "completed" ? "rewatch" : state === "available" ? "play" : "locked"}">
+        ${state === "completed" ? "Rewatch" : state === "available" ? "Play" : "🔒"}
       </button>
     `;
 
     if (state !== "locked") {
-      row.querySelector("button").onclick = () => {
-        playVideo(v.id, v.title, v.videoUrl, state === "completed");
+      row.querySelector("button").onclick = ()=>{
+        playVideo(v.id, v.title, v.videoUrl, done);
       };
     }
 
     list.appendChild(row);
   });
 
-  // STEP 4: progress bar
-  const percent = allowedList.length
-    ? Math.round((completedCount / allowedList.length) * 100)
+  const percent = videos.length
+    ? Math.round((completedCount / videos.length) * 100)
     : 0;
 
   progress.innerHTML = `
     <div style="display:flex;justify-content:space-between;margin-bottom:8px">
       <strong>Progress</strong>
-      <span>${completedCount} / ${allowedList.length} (${percent}%)</span>
+      <span>${completedCount} / ${videos.length} (${percent}%)</span>
     </div>
     <div style="background:#e5e7eb;height:10px;border-radius:20px;overflow:hidden">
       <div style="width:${percent}%;height:100%;background:#22c55e"></div>
     </div>
   `;
 
-  loading.style.display = "none";
+  loading.style.display="none";
 }
+
 
 
 /* PLAY VIDEO */
@@ -260,20 +233,31 @@ function playVideo(id,title,embedUrl,completed){
 }
 
 /* FINISHED WATCHING */
-finishBtn.onclick=async()=>{
-  if(!currentVideoId) return;
+finishBtn.onclick = async () => {
+  if (!currentVideoId) return;
 
-  const ref=doc(db,"courses",COURSE_ID,"live_recorded_classes",currentVideoId);
-  const snap=await getDoc(ref);
-  const done=snap.data().completedBy||[];
+  const ref = doc(
+    db,
+    "courses",
+    COURSE_ID,
+    "live_recorded_classes",
+    currentVideoId
+  );
 
-  if(!done.includes(currentUserId)){
-    await updateDoc(ref,{completedBy:[...done,currentUserId]});
-  }
+  // ✅ SAFE update
+  await updateDoc(ref, {
+    completedBy: arrayUnion(currentUserId)
+  });
 
-  finishBtn.style.display="none";
-  loadVideos();
+  // ✅ Reset player
+  document.getElementById("player").src = "";
+  document.getElementById("playerBox").style.display = "none";
+  currentVideoId = null;
+
+  // ✅ Recalculate unlocks
+  await loadVideos();
 };
+
 </script>
 
 </body>
