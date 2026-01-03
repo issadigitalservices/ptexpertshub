@@ -137,73 +137,116 @@ onAuthStateChanged(auth, async user=>{
 
 /* LOAD VIDEOS */
 async function loadVideos(){
-  list.innerHTML="";
-  loading.style.display="flex";
+  list.innerHTML = "";
+  loading.style.display = "flex";
 
-  const q=query(
+  const q = query(
     collection(db,"courses",COURSE_ID,"live_recorded_classes"),
     orderBy("order","asc")
   );
-  const snap=await getDocs(q);
 
-  let allowNext=true, completedCount=0, visibleCount=0;
+  const snap = await getDocs(q);
+
+  // STEP 1: build allowed list in order
+  const allowedList = [];
 
   snap.forEach(d=>{
-    const v=d.data();
+    if (
+      Array.isArray(allowedVideos) &&
+      allowedVideos.includes(d.id)
+    ) {
+      allowedList.push({
+        id: d.id,
+        ...d.data()
+      });
+    }
+  });
 
-    // 🔐 ACCESS CONTROL: hide if not allowed
-    if(allowedVideos && !allowedVideos.includes(d.id)) return;
+  let completedCount = 0;
+  let unlockIndex = -1;
 
-    visibleCount++;
+  // STEP 2: find first NOT completed video
+  allowedList.forEach((v, index)=>{
+    if (v.completedBy?.includes(currentUserId)) {
+      completedCount++;
+    } else if (unlockIndex === -1) {
+      unlockIndex = index;
+    }
+  });
 
-    const done=v.completedBy?.includes(currentUserId);
-    if(done) completedCount++;
+  // If all completed, nothing to unlock
+  if (unlockIndex === -1) unlockIndex = allowedList.length;
 
-    let state="locked";
-    if(done) state="completed";
-    else if(allowNext) state="available";
+  // STEP 3: render videos
+  allowedList.forEach((v, index)=>{
+    let state = "locked";
 
-    if(!done && allowNext) allowNext=false;
+    if (v.completedBy?.includes(currentUserId)) {
+      state = "completed";
+    } else if (index === unlockIndex) {
+      state = "available";
+    }
 
-    const row=document.createElement("div");
-    row.className=`item ${state==="locked"?"locked":""}`;
-    row.innerHTML=`
+    const row = document.createElement("div");
+    row.className = `item ${state === "locked" ? "locked" : ""}`;
+
+    row.innerHTML = `
       <div>
         <strong>${v.title}</strong><br>
         <span class="badge ${state}">
-          ${state==="completed"?"Completed":state==="available"?"Available":"Locked"}
+          ${
+            state === "completed"
+              ? "Completed"
+              : state === "available"
+              ? "Available"
+              : "Locked"
+          }
         </span>
       </div>
-      <button class="play ${state==="completed"?"rewatch":state==="available"?"play":"locked"}">
-        ${state==="completed"?"Rewatch":state==="available"?"Play":"🔒"}
+      <button class="play ${
+        state === "completed"
+          ? "rewatch"
+          : state === "available"
+          ? "play"
+          : "locked"
+      }">
+        ${
+          state === "completed"
+            ? "Rewatch"
+            : state === "available"
+            ? "Play"
+            : "🔒"
+        }
       </button>
     `;
 
-    if(state!=="locked"){
-      row.querySelector("button").onclick=()=>{
-        playVideo(d.id,v.title,v.videoUrl,done);
+    if (state !== "locked") {
+      row.querySelector("button").onclick = () => {
+        playVideo(v.id, v.title, v.videoUrl, state === "completed");
       };
     }
 
     list.appendChild(row);
   });
 
-  const percent = visibleCount
-    ? Math.round((completedCount / visibleCount) * 100)
+  // STEP 4: progress bar
+  const percent = allowedList.length
+    ? Math.round((completedCount / allowedList.length) * 100)
     : 0;
 
   progress.innerHTML = `
     <div style="display:flex;justify-content:space-between;margin-bottom:8px">
       <strong>Progress</strong>
-      <span>${completedCount} / ${visibleCount} (${percent}%)</span>
+      <span>${completedCount} / ${allowedList.length} (${percent}%)</span>
     </div>
     <div style="background:#e5e7eb;height:10px;border-radius:20px;overflow:hidden">
       <div style="width:${percent}%;height:100%;background:#22c55e"></div>
     </div>
   `;
 
-  loading.style.display="none";
+  loading.style.display = "none";
 }
+
 
 /* PLAY VIDEO */
 function playVideo(id,title,embedUrl,completed){
