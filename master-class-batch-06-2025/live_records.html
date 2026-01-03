@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <title>Live Recorded Classes – PT Experts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-import { arrayUnion } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 
 <script type="module" src="firebase-config.js"></script>
 
@@ -107,9 +104,17 @@ iframe{width:100%;height:420px;border:none;border-radius:12px}
 import { onAuthStateChanged } from
   "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
-  collection,getDocs,doc,getDoc,updateDoc,query,orderBy
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  updateDoc,
+  query,
+  orderBy,
+  arrayUnion   // ✅ ADD HERE
 } from
   "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 const auth=window.auth, db=window.db;
 const COURSE_ID="masterclass_batch_06_2025";
