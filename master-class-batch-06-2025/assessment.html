@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Assessment – PT Experts Masterclass</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase init -->
+<script type="module" src="firebase-config.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:#f4f7fb;
+}
+
+/* HEADER */
+header{
+  background:#0a1a32;
+  color:#fff;
+  padding:1rem 1.5rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logout{
+  cursor:pointer;
+  font-weight:600;
+  color:#facc15;
+}
+
+/* CONTENT */
+.container{
+  max-width:900px;
+  margin:2rem auto;
+  padding:1.5rem;
+  background:#ffffff;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+h2{
+  margin-top:0;
+}
+
+p{
+  color:#475569;
+  line-height:1.6;
+}
+
+.assessment-btn{
+  display:inline-block;
+  margin-top:1.5rem;
+  padding:.8rem 1.6rem;
+  background:#facc15;
+  color:#000;
+  font-weight:700;
+  border-radius:10px;
+  text-decoration:none;
+}
+
+.note{
+  margin-top:1rem;
+  font-size:.9rem;
+  color:#64748b;
+}
+
+/* LOADING */
+.loading{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#64748b;
+}
+.hidden{display:none}
+
+.dashboard-link{
+  display:inline-block;
+  margin-top:1.2rem;
+  padding:.6rem 1.4rem;
+  border-radius:10px;
+  background:#0a1a32;
+  color:#ffffff;
+  font-weight:700;
+  text-decoration:none;
+}
+.dashboard-link:hover{
+  opacity:.9;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOADING -->
+<div id="loading" class="loading">
+  Checking access…
+</div>
+
+<!-- CONTENT -->
+<div id="content" class="hidden">
+
+<header>
+  <span>Assessment</span>
+  <span class="logout" onclick="logout()">Logout</span>
+</header>
+
+<div class="container">
+  <h2>📘 Pre-Class Assessment</h2>
+
+  <p>
+    Hey everyone! 👋  
+    Before our next class, please complete this short quiz to brush up on
+    the basics of post-tensioning.
+  </p>
+
+  <p>
+    It will only take a few minutes and will help us tailor the live
+    session better for you.
+  </p>
+
+  <a class="assessment-btn"
+     href="https://docs.google.com/forms/d/e/1FAIpQLSfcof3AOIer-Xu5wwtr3NYsoHC6Qc9rqdsY135AAGM5CgGLEw/viewform?usp=header"
+     target="_blank">
+     Take Assessment Quiz
+  </a>
+
+  <p class="note">
+  After submitting the quiz, please close the form tab and return here.
+</p>
+
+<a href="masterclass_index.html" class="dashboard-link">
+  ⬅ Go to Course Dashboard
+</a>
+
+</div>
+
+</div>
+
+<script type="module">
+import { onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { doc, getDoc }
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const auth = window.auth;
+const db = window.db;
+
+/* AUTH CHECK */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    location.href = "masterclass_login.html";
+    return;
+  }
+
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+  if (!userSnap.exists() || userSnap.data().paid !== true) {
+    await signOut(auth);
+    location.href = "masterclass_login.html";
+    return;
+  }
+
+  // SHOW PAGE
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("content").classList.remove("hidden");
+});
+
+/* LOGOUT */
+window.logout = async () => {
+  await signOut(auth);
+  location.href = "masterclass_login.html";
+};
+</script>
+
+</body>
+</html>
